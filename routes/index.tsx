@@ -1,7 +1,6 @@
 import { useSignal } from "@preact/signals";
 import { Handlers } from "$fresh/server.ts";
 import Validator from "../islands/Validator.tsx";
-import { validate } from "../../../psych-ds/psychds-validator/src/validators/psychds.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
