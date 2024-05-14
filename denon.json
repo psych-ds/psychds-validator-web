@@ -1,0 +1,9 @@
+{
+    "scripts": {
+        "start": {
+            "cmd": "deno",
+            "args": ["run","--allow-run","--allow-env","--allow-read", "--allow-net", "main.ts"]
+        }
+    }
+}
+

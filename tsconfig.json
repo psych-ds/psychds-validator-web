@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "esnext",
+    "jsx": "react",
+    "lib": ["deno.window", "deno.unstable"],
+    "types": ["deno.window", "dom", "react"]
+  }
+}
