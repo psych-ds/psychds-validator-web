@@ -1,5 +1,5 @@
 import { useEffect } from "preact/hooks";
-import { DatasetIssues } from "../static/psychds-validator.js";
+import { DatasetIssues } from "../static/old-psychds-validator.js";
 
 export type Severity = 'warning' | 'error' | 'ignore'
 

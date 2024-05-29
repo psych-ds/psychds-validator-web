@@ -1323,7 +1323,7 @@ const ignore = (options)=>new Ignore(options);
 const isPathValid = (path)=>checkPath(path && checkPath.convert(path), path, RETURN_FALSE);
 ignore.isPathValid = isPathValid;
 async function readPsychDSIgnore(file) {
-    const value = await file.text();
+    const value = await file.fileText;
     if (value) {
         const lines = value.split('\n');
         return lines;
@@ -1372,28 +1372,25 @@ class psychDSFileDeno {
     #ignore;
     name;
     path;
-    text;
+    expanded;
+    fileText;
+    issueInfo;
     #fileInfo;
     #datasetAbsPath;
-    constructor(datasetPath, path, ignore, text){
+    constructor(datasetPath, path, ignore){
         this.#datasetAbsPath = datasetPath;
         this.path = path;
         this.name = basename2(path);
-        this.text = text;
+        this.fileText = '';
+        this.expanded = {}
+        this.issueInfo = []
         this.#ignore = ignore;
-        try {
-            this.#fileInfo = Deno.statSync(this._getPath());
-        } catch (error) {
-            if (error.code === 'ENOENT') {
-                this.#fileInfo = Deno.lstatSync(this._getPath());
-            }
-        }
     }
     _getPath() {
         return join3(this.#datasetAbsPath, this.path);
     }
     get size() {
-        return this.#fileInfo ? this.#fileInfo.size : -1;
+        return this.fileText.length
     }
     get stream() {
         const handle = this.#openHandle();
@@ -1437,29 +1434,64 @@ class psychDSFileDeno {
         return Deno.openSync(this._getPath(), openOptions);
     }
 }
-async function _readFileTree(rootPath, relativePath, ignore, parent) {
-    await requestReadPermission();
-    const name = basename2(relativePath);
+async function _readFileTree(dirDict, name, relativePath, ignore, parent, context) {
     const tree = new FileTree(relativePath, name, parent);
-    for await (const dirEntry of Deno.readDir(join3(rootPath, relativePath))){
-        if (dirEntry.isFile || dirEntry.isSymlink) {
-            const file = new psychDSFileDeno(rootPath, join3(relativePath, dirEntry.name), ignore);
-            if (dirEntry.name === '.psychdsignore') {
-                ignore.add(await readPsychDSIgnore(file));
+    for (const key in dirDict){
+        const path = (relativePath === '/') ? `/${key}` : `${relativePath}/${key}`
+
+        if (dirDict[key]['type'] === 'file') {
+            const file = new psychDSFileDeno(null, path, ignore);
+            file.fileText = dirDict[key]['text'].replace('http://schema.org','https://schema.org').replace('http://www.schema.org','https://schema.org')
+
+            if (key === '.psychdsignore') {
+                ignore.add(dirDict[key][lines]);
+            }
+            if (key.endsWith('.json')) {
+                let json = {};
+                let exp = [];
+                try {
+                    json = await JSON.parse(file.fileText);
+                    if (!parent && key.endsWith('dataset_description.json') && '@context' in json) {
+                        context = json['@context'];
+                    } else if (context) {
+                        json = {
+                            ...json,
+                            '@context': context
+                        };
+                    }
+                } catch (_error) {
+                    file.issueInfo.push({
+                        key: 'InvalidJsonFormatting'
+                    });
+                }
+                try {
+                    exp = await jsonld.expand(json);
+                    if (exp.length > 0) file.expanded = exp[0];
+                    console.log(file.name,file.expanded)
+                } catch (error) {
+                    console.log(error)
+                    file.issueInfo.push({
+                        key: 'InvalidJsonldSyntax',
+                        evidence: `${error.message.split(';')[1]}`
+                    });
+                }
             }
             tree.files.push(file);
         }
-        if (dirEntry.isDirectory) {
-            const dirTree = await _readFileTree(rootPath, join3(relativePath, dirEntry.name), ignore, tree);
+        else {
+            const dirTree = await _readFileTree(dirDict[key]['contents'], key,path, ignore, tree, context);
             tree.directories.push(dirTree);
         }
     }
     return tree;
 }
-function readFileTree(rootPath) {
+function readFileTree(dirDict) {
     const ignore = new FileIgnoreRules([]);
-    return _readFileTree(rootPath, '/', ignore);
+    return _readFileTree(dirDict, '/','/', ignore,null);
 }
+export { FileIgnoreRules as FileIgnoreRules };
 export { UnicodeDecodeError as UnicodeDecodeError };
 export { psychDSFileDeno as psychDSFileDeno };
-export { FileIgnoreRules as FileIgnoreRules}
+export { _readFileTree as _readFileTree };
+export { readFileTree as readFileTree };
+
