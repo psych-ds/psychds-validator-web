@@ -1,5 +1,4 @@
 import { useEffect } from "preact/hooks";
-import { DatasetIssues } from "../static/old-psychds-validator.js";
 
 export type Severity = 'warning' | 'error' | 'ignore'
 
@@ -49,7 +48,7 @@ export default function Output({issues,validationResult,showWarnings,verbose}:Pr
     return (
         <div class=''>
             {validationResult ? 
-            <div class="border border-black border-solid mb-6 p-6">
+            <div class="bg-white rounded-2xl border border-black border-solid mb-6 p-6">
                 <h3 class="text-green-600"><b>
                     **************************************************<br />
                     This dataset appears to be psych-DS compatible<br />
@@ -57,7 +56,7 @@ export default function Output({issues,validationResult,showWarnings,verbose}:Pr
                     </b></h3>
             </div>
             : 
-            <div class="border border-black border-solid mb-6 p-6">
+            <div class=" bg-white rounded-2xl border border-black border-solid mb-6 p-6">
                 <h3 class="text-red-600"><b>
                     ***********************************************************<br />
                     This dataset does not appear to be psych-DS compatible<br />
@@ -67,7 +66,7 @@ export default function Output({issues,validationResult,showWarnings,verbose}:Pr
             </div>
             }
             {issues.errors.map((item,index) => (
-                <div class="hover:scale-[1.03] transition-transform duration-100 border border-black border-solid mb-6 p-6">
+                <div class="bg-white rounded-2xl hover:scale-[1.03] transition-transform duration-100 border border-black border-solid mb-6 p-6">
                     <h3 ><b class="text-red-600">ERROR:</b> {item.key}</h3>
                     <hr />
                     <p><b>Reason: </b>{item.reason}</p>
@@ -101,7 +100,7 @@ export default function Output({issues,validationResult,showWarnings,verbose}:Pr
             ))}
             {showWarnings &&
                 issues.warnings.map((item,index) => (
-                    <div class="hover:scale-[1.03] transition-transform duration-100 border border-black border-solid mb-6 p-6">
+                    <div class="bg-white rounded-2xl hover:scale-[1.03] transition-transform duration-100 border border-black border-solid mb-6 p-6">
                         <h3 ><b class="text-yellow-600">WARNING:</b> {item.key}</h3>
                         <hr />
                         <p><b>Reason: </b>{item.reason}</p>

@@ -14,10 +14,10 @@ export const handler: Handlers = {
 export default function Home() {
   return (
     <div id="root">
-      <nav class="navbar navbar-dark bg-black fixed top-0 w-full">
+      <nav class="navbar navbar-dark bg-black fixed top-0 h-8 w-full">
           <div class=" pl-16">
               <a
-                class="navbar-brand text-white mr-auto p-1 pt-2 pb-2"
+                class="text-lg navbar-brand text-white mr-auto p-1 pt-2 pb-2 "
                 href="https://www.npmjs.com/package/bids-validator"
                 target="_blank">
                 Psych-DS Validator

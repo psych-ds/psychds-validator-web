@@ -169,7 +169,7 @@ export default function Validator() {
     return (
 
         <div class="container pl-16 pr-auto text-left  ">
-            <div class="border border-black border-solid p-6">
+            <div class="border rounded-2xl bg-gray-100 border-black border-solid p-6">
                 <h2 class="text-left"><b>Select a Psych-DS dataset to validate</b></h2>
                 {/* @ts-ignore */}
                 <input class="pb-2" type='file' directory webkitdirectory
@@ -192,7 +192,8 @@ export default function Validator() {
                     </label>
                 </form>
             </div>
-            <div class="border border-black border-solid p-6 max-h-screen overflow-auto">
+            <br/>
+            <div class="rounded-2xl border bg-gray-100 border-black border-solid p-6 max-h-screen overflow-auto">
                 {validationComplete && <Output issues={issues} validationResult={validationResult} showWarnings={showWarnings} verbose={verbose}/>}
             </div>
         </div>
