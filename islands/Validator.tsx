@@ -1,11 +1,9 @@
 
 import Output from './Output.tsx'
 import { useEffect, useState } from "preact/hooks";
-import { FileIgnoreRules } from "../static/fileio.js";
-import { psychDSFileDeno } from "../static/fileio.js";
-import { validate, DatasetIssues } from "../static/psychds-validator.js";
-
-
+import { psychDSFileDeno, FileIgnoreRules,_readFileTree,readFileTree } from "../static/fileio.js";
+import { validate } from "../static/psychds-validator.js";
+import { DatasetIssues } from "../static/datasetIssues.js"
 
 interface FileEntry {
     name: string;
@@ -80,30 +78,60 @@ async function readDirectory(dirHandle: FileSystemDirectoryHandle) {
 
     return tree as { [key:string]: TreeEntry};
 }
-
-async function _readFileTree(dirDict:{ [key:string]: TreeEntry}, name:string, relativePath:string, ignore:FileIgnoreRules, parent:FileTree|null) {
+/*
+async function _readFileTree(dirDict:{ [key:string]: TreeEntry}, name:string, relativePath:string, ignore:FileIgnoreRules, parent:FileTree|null, context?: object | null) {
     const tree = new FileTree(relativePath, name, parent);
     for ( const key in dirDict){
         const path = (relativePath === '/') ? `/${key}` : `${relativePath}/${key}`
         if(dirDict[key]['type'] === 'file'){
-            const file = new psychDSFileDeno(null,path,ignore,(dirDict[key] as FileEntry)['text'])
+            
+            const file = new psychDSFileDeno(null,path,ignore)
+            file.fileText = (dirDict[key] as FileEntry)['text']
             if(key === ".psychdsignore"){
                 ignore.add((dirDict[key] as FileEntry)['lines'])
+            }
+            if(key.endsWith('.json')){
+                let json = {}
+                let exp = []
+                try{
+                    json = await JSON.parse(file.fileText)
+                    if(!parent && key.endsWith('dataset_description.json') && '@context' in json){
+                        context = json['@context'] as object
+                    }
+                    else if(context){
+                        json = {
+                            ...json,
+                            '@context': context
+                        }
+                    }
+                }
+                catch(error){
+                    file.issueInfo.push({
+                        key: 'InvalidJsonFormatting'
+                    })
+                }
+                try{
+                    exp = await jsonld.expand(json)
+                    if (exp.length > 0)
+                        file.expanded = exp[0]
+                }
+                catch(error){
+                    file.issueInfo.push({
+                        key: 'InvalidJsonldSyntax',
+                        evidence: `${error.message.split(';')[1]}`
+                      })
+                }
             }
             tree.files.push(file)
         }
         else{
-            const dirTree = await _readFileTree((dirDict[key] as DirectoryEntry)['contents'] as { [key:string]: TreeEntry},key,path,ignore,tree)
+            const dirTree = await _readFileTree((dirDict[key] as DirectoryEntry)['contents'] as { [key:string]: TreeEntry},key,path,ignore,tree,context)
             tree.directories.push(dirTree)
         }
     }
     return tree;
-}
+}*/
 
-function readFileTree(dirDict:{ [key:string]: TreeEntry}) {
-    const ignore = new FileIgnoreRules([]);
-    return _readFileTree(dirDict, '/','/',ignore,null);
-}
 
 
 export default function Validator() {
@@ -141,7 +169,7 @@ export default function Validator() {
     return (
 
         <div class="container pl-16 pr-auto text-left  ">
-            <div class="border border-black border-solid p-6">
+            <div class="border rounded-2xl bg-gray-100 border-black border-solid p-6">
                 <h2 class="text-left"><b>Select a Psych-DS dataset to validate</b></h2>
                 {/* @ts-ignore */}
                 <input class="pb-2" type='file' directory webkitdirectory
@@ -164,7 +192,8 @@ export default function Validator() {
                     </label>
                 </form>
             </div>
-            <div class="border border-black border-solid p-6 max-h-screen overflow-auto">
+            <br/>
+            <div class="rounded-2xl border bg-gray-100 border-black border-solid p-6 max-h-screen overflow-auto">
                 {validationComplete && <Output issues={issues} validationResult={validationResult} showWarnings={showWarnings} verbose={verbose}/>}
             </div>
         </div>

@@ -142,7 +142,7 @@ const issueFile = (issue, f)=>{
         helpUrl: issue.helpUrl
     };
 };
-export class DatasetIssues extends Map {
+class DatasetIssues extends Map {
     schema;
     constructor(schema){
         super();
@@ -1936,7 +1936,7 @@ function evalJsonCheck(rule, context, _schema, schemaPath) {
     for (const [key, requirement] of Object.entries(rule.fields)){
         const severity = getFieldSeverity(requirement, context);
         const keyName = `${rule.namespace}${key}`;
-        if (severity && severity !== 'ignore' && !(keyName in context.expandedSidecar)) {
+        if (severity && severity !== 'ignore' && !(keyName in context.sidecar)) {
             if (requirement.issue?.code && requirement.issue?.message) {
                 context.issues.add({
                     key: requirement.issue.code,
@@ -1964,12 +1964,12 @@ function evalJsonCheck(rule, context, _schema, schemaPath) {
     }
 }
 function schemaCheck(context, schema, issues) {
-    const schemaNamespace = 'https://schema.org/';
-    if ("@type" in context.expandedSidecar) {
-        if (context.expandedSidecar['@type'][0] !== `${schemaNamespace}Dataset`) {
+    const schemaNamespace = 'http://schema.org/';
+    if ("@type" in context.sidecar) {
+        if (context.sidecar['@type'][0] !== `${schemaNamespace}Dataset`) {
             let issueFile;
             if (Object.keys(context.metadataProvenance).includes('@type')) issueFile = context.metadataProvenance['@type'];
-            else issueFile = context.file;
+            else issueFile = context.dataset.metadataFile;
             context.issues.addSchemaIssue('IncorrectDatasetType', [
                 {
                     ...issueFile,
@@ -1989,7 +1989,7 @@ function schemaCheck(context, schema, issues) {
         ]);
         return;
     }
-    issues = _schemaCheck(context.expandedSidecar, context, schema, '', schemaNamespace, issues);
+    issues = _schemaCheck(context.sidecar, context, schema, '', schemaNamespace, issues);
     logSchemaIssues(context, issues);
 }
 function logSchemaIssues(context, issues) {
@@ -2119,7 +2119,6 @@ function getSuperClassSlots(type, schema, nameSpace) {
     if (type.includes(nameSpace)) {
         type = type.replace(nameSpace, "");
     }
-    console.log(schema);
     if (type in schema[`schemaOrg.classes`]) {
         if ('is_a' in schema[`schemaOrg.classes.${type}`]) {
             if ('slots' in schema[`schemaOrg.classes.${type}`]) {
@@ -2236,26 +2235,15 @@ async function loadSchema(version = 'latest') {
         schemaUrl = `https://raw.githubusercontent.com/psych-ds/psych-DS/develop/schema_model/versions/jsons/${version}/schema.json?v=${Date.now()}`;
     }
     try {
-        let schemaModule = await fetch(schemaUrl)
-            .then(response => response.text())
-            .then(data => JSON.parse(data))
-            .catch(error => {
-                console.error('Error fetching JSON:', error);
-              });
-        /*let schemaModule = await import(schemaUrl, {
-            with: {
-                type: 'json'
-            }
-        });*/
+        let schemaModule = await fetch(schemaUrl).then((response)=>response.text()).then((data)=>JSON.parse(data)).catch((error)=>{
+            console.error('Error fetching JSON:', error);
+        });
         schemaModule = {
             ...schemaModule
         };
-        let schemaOrgModule = await fetch(schemaOrgUrl)
-            .then(response => response.text())
-            .then(data => JSON.parse(data))
-            .catch(error => {
-                console.error('Error fetching JSON:', error);
-              });
+        const schemaOrgModule = await fetch(schemaOrgUrl).then((response)=>response.text()).then((data)=>JSON.parse(data)).catch((error)=>{
+            console.error('Error fetching JSON:', error);
+        });
         schemaModule = {
             ...schemaModule,
             schemaOrg: schemaOrgModule
@@ -2394,7 +2382,7 @@ class psychDSContext {
         this.suggestedColumns = [];
     }
     get json() {
-        return this.file.text().then((text)=>JSON.parse(text)).catch((_error)=>{});
+        return JSON.parse(this.file.fileText);
     }
     get path() {
         return this.file.path;
@@ -2403,67 +2391,52 @@ class psychDSContext {
         return this.fileTree.path;
     }
     async loadSidecar(fileTree) {
-        try{
-            if (!fileTree) {
-                fileTree = this.fileTree;
-            }
-            const validSidecars = fileTree.files.filter((file)=>{
-                const { suffix, extension } = readElements(file.name);
-                return (extension === '.json' && suffix === "data" && file.name.split('.')[0] === this.fileName) || (extension === '.json' && file.name.split('.')[0] == "file_metadata");
-            });
-            if (validSidecars.length > 1) {
-                const exactMatch = validSidecars.find((sidecar)=>sidecar.path == this.file.path.replace(this.extension, '.json'));
-                if (exactMatch) {
-                    validSidecars.splice(1);
-                    validSidecars[0] = exactMatch;
-                } else {
-                    logger.warning(`Multiple sidecar files detected for '${this.file.path}'`);
-                }
-            }
-            if (validSidecars.length === 1) {
-                let parsed_json = {}
-                try{
-                    parsed_json = await JSON.parse(validSidecars[0].text);
-                }
-                catch(error){
-                    this.issues.addSchemaIssue('InvalidJsonFormatting', [
-                        validSidecars[0]
-                    ]);
-                }
-                this.sidecar = {
-                    ...this.sidecar,
-                    ...parsed_json
-                };
-                Object.keys(parsed_json).forEach((key)=>{
-                    this.metadataProvenance[key] = validSidecars[0];
-                });
-            }
-            const nextDir = fileTree.directories.find((directory)=>{
-                return this.file.path.startsWith(directory.path);
-            });
-            if (nextDir) {
-                await this.loadSidecar(nextDir);
+        if (!fileTree) {
+            fileTree = this.fileTree;
+        }
+        const validSidecars = fileTree.files.filter((file)=>{
+            const { suffix, extension } = readElements(file.name);
+            return extension === '.json' && suffix === "data" && file.name.split('.')[0] === this.fileName || extension === '.json' && file.name.split('.')[0] == "file_metadata";
+        });
+        if (validSidecars.length > 1) {
+            const exactMatch = validSidecars.find((sidecar)=>sidecar.path == this.file.path.replace(this.extension, '.json'));
+            if (exactMatch) {
+                validSidecars.splice(1);
+                validSidecars[0] = exactMatch;
             } else {
-                this.expandedSidecar = await this.getExpandedSidecar();
-                console.log(this.expandedSidecar)
-                this.loadValidColumns();
+                logger.warning(`Multiple sidecar files detected for '${this.file.path}'`);
             }
         }
-        catch(error){
-            console.log(error)
+        if (validSidecars.length === 1) {
+            this.sidecar = {
+                ...this.sidecar,
+                ...validSidecars[0].expanded
+            };
+            Object.keys(validSidecars[0].expanded).forEach((key)=>{
+                const baseKey = key.split('/').at(-1);
+                this.metadataProvenance[baseKey] = validSidecars[0];
+            });
         }
-        
+        const nextDir = fileTree.directories.find((directory)=>{
+            return this.file.path.startsWith(directory.path);
+        });
+        if (nextDir) {
+            await this.loadSidecar(nextDir);
+        } else {
+            this.expandedSidecar = {};
+            this.loadValidColumns();
+        }
     }
     loadValidColumns() {
         if (this.extension !== '.csv') {
             return;
         }
-        const nameSpace = "https://schema.org/";
-        if (!(`${nameSpace}variableMeasured` in this.expandedSidecar)) {
+        const nameSpace = "http://schema.org/";
+        if (!(`${nameSpace}variableMeasured` in this.sidecar)) {
             return;
         }
         let validColumns = [];
-        for (const variable of this.expandedSidecar[`${nameSpace}variableMeasured`]){
+        for (const variable of this.sidecar[`${nameSpace}variableMeasured`]){
             if ('@value' in variable) validColumns = [
                 ...validColumns,
                 variable['@value']
@@ -2484,11 +2457,14 @@ class psychDSContext {
         if (this.extension !== '.csv') {
             return;
         }
-        const result = await parseCSV(this.file.text).catch((error)=>{
+        let result;
+        try {
+            result = await parseCSV(this.file.fileText);
+        } catch (error) {
             logger.warning(`csv file could not be opened by loadColumns '${this.file.path}'`);
             logger.debug(error);
-            return new Map();
-        });
+            result = new Map();
+        }
         this.columns = result['columns'];
         this.reportCSVIssues(result['issues']);
         return;
@@ -2499,40 +2475,6 @@ class psychDSContext {
                 this.file
             ]);
         });
-    }
-    async getExpandedSidecar() {
-        try {
-            if ('@context' in this.sidecar){
-                if(typeof(this.sidecar['@context']) == 'string'){
-                    this.sidecar['@context'] = this.sidecar['@context'].replace('http:','https:')
-                    if(!this.sidecar['@context'].endsWith('/'))
-                        this.sidecar['@context'] += '/'
-                    if(this.sidecar['@context'] === 'https://schema.org/'){
-                        this.sidecar['@context'] = {'@vocab':'https://schema.org/'}
-                    }
-                }
-    
-            }
-            const exp = await jsonld.expand(this.sidecar)
-            if (!exp[0]) {
-                return {};
-            }
-            else return exp[0];
-        } catch (error) {
-            const issueFile = {
-                ...this.file,
-                evidence: JSON.stringify(error.details.context)
-            };
-            this.issues.add({
-                key: 'INVALID_JSONLD_SYNTAX',
-                reason: `${error.message.split(';')[1]}`,
-                severity: 'error',
-                files: [
-                    issueFile
-                ]
-            });
-            return {};
-        }
     }
     async asyncLoads() {
         await Promise.allSettled([
@@ -2573,9 +2515,8 @@ async function validate(fileTree, options) {
     let dsContext;
     if (ddFile) {
         try {
-            //const description = await ddFile.text().then((text)=>JSON.parse(text));
-            const description = await JSON.parse(ddFile.text);
-            
+            const description = ddFile.expanded;
+            console.log(description)
             dsContext = new psychDSContextDataset(options, ddFile, description);
         } catch (_error) {
             dsContext = new psychDSContextDataset(options, ddFile);
@@ -2589,6 +2530,16 @@ async function validate(fileTree, options) {
     const rulesRecord = {};
     findFileRules(schema, rulesRecord);
     for await (const context of walkFileTree(fileTree, issues, dsContext)){
+        if (context.file.issueInfo.length > 0) {
+            context.file.issueInfo.forEach((iss)=>{
+                issues.addSchemaIssue(iss.key, [
+                    {
+                        ...context.file,
+                        evidence: iss.evidence ? iss.evidence : ''
+                    }
+                ]);
+            });
+        }
         if (context.file.ignored) {
             continue;
         }
@@ -2622,3 +2573,4 @@ async function validate(fileTree, options) {
     return output;
 }
 export { validate as validate };
+
