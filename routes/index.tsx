@@ -18,7 +18,7 @@ export default function Home() {
           <div class=" pl-16">
               <a
                 class="text-lg navbar-brand text-white mr-auto p-1 pt-2 pb-2 "
-                href="https://www.npmjs.com/package/bids-validator"
+                href="https://github.com/psych-ds/psychds-validator"
                 target="_blank">
                 Psych-DS Validator
               </a>
