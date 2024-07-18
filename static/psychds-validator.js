@@ -2286,36 +2286,292 @@ function _readElements(filename) {
     };
 }
 const readElements = memoize(_readElements);
+class ParseError extends SyntaxError {
+    startLine;
+    line;
+    column;
+    constructor(start, line, column, message){
+        super();
+        this.startLine = start;
+        this.column = column;
+        this.line = line;
+        if (message === ERR_FIELD_COUNT) {
+            this.message = `record on line ${line}: ${message}`;
+        } else if (start !== line) {
+            this.message = `record on line ${start}; parse error on line ${line}, column ${column}: ${message}`;
+        } else {
+            this.message = `parse error on line ${line}, column ${column}: ${message}`;
+        }
+    }
+}
+const ERR_BARE_QUOTE = 'bare " in non-quoted-field';
+const ERR_QUOTE = 'extraneous or missing " in quoted-field';
+const ERR_INVALID_DELIM = "Invalid Delimiter";
+const ERR_FIELD_COUNT = "wrong number of fields";
+function convertRowToObject(row, headers, index) {
+    if (row.length !== headers.length) {
+        throw new Error(`Error number of fields line: ${index}\nNumber of fields found: ${headers.length}\nExpected number of fields: ${row.length}`);
+    }
+    const out = {};
+    for (const [index, header] of headers.entries()){
+        out[header] = row[index];
+    }
+    return out;
+}
+const BYTE_ORDER_MARK = "\ufeff";
+class Parser {
+    #input = "";
+    #cursor = 0;
+    #options;
+    constructor({ separator = ",", trimLeadingSpace = false, comment, lazyQuotes, fieldsPerRecord } = {}){
+        this.#options = {
+            separator,
+            trimLeadingSpace,
+            comment,
+            lazyQuotes,
+            fieldsPerRecord
+        };
+    }
+    #readLine() {
+        if (this.#isEOF()) return null;
+        if (!this.#input.startsWith("\r\n", this.#cursor) || !this.#input.startsWith("\n", this.#cursor)) {
+            let buffer = "";
+            let hadNewline = false;
+            while(this.#cursor < this.#input.length){
+                if (this.#input.startsWith("\r\n", this.#cursor)) {
+                    hadNewline = true;
+                    this.#cursor += 2;
+                    break;
+                }
+                if (this.#input.startsWith("\n", this.#cursor)) {
+                    hadNewline = true;
+                    this.#cursor += 1;
+                    break;
+                }
+                buffer += this.#input[this.#cursor];
+                this.#cursor += 1;
+            }
+            if (!hadNewline && buffer.endsWith("\r")) {
+                buffer = buffer.slice(0, -1);
+            }
+            return buffer;
+        }
+        return null;
+    }
+    #isEOF() {
+        return this.#cursor >= this.#input.length;
+    }
+    #parseRecord(startLine) {
+        let line = this.#readLine();
+        if (line === null) return null;
+        if (line.length === 0) {
+            return [];
+        }
+        function runeCount(s) {
+            return Array.from(s).length;
+        }
+        let lineIndex = startLine + 1;
+        if (this.#options.comment && line[0] === this.#options.comment) {
+            return [];
+        }
+        let fullLine = line;
+        let quoteError = null;
+        const quote = '"';
+        const quoteLen = quote.length;
+        const separatorLen = this.#options.separator.length;
+        let recordBuffer = "";
+        const fieldIndexes = [];
+        parseField: for(;;){
+            if (this.#options.trimLeadingSpace) {
+                line = line.trimStart();
+            }
+            if (line.length === 0 || !line.startsWith(quote)) {
+                const i = line.indexOf(this.#options.separator);
+                let field = line;
+                if (i >= 0) {
+                    field = field.substring(0, i);
+                }
+                if (!this.#options.lazyQuotes) {
+                    const j = field.indexOf(quote);
+                    if (j >= 0) {
+                        const col = runeCount(fullLine.slice(0, fullLine.length - line.slice(j).length));
+                        quoteError = new ParseError(startLine + 1, lineIndex, col, ERR_BARE_QUOTE);
+                        break parseField;
+                    }
+                }
+                recordBuffer += field;
+                fieldIndexes.push(recordBuffer.length);
+                if (i >= 0) {
+                    line = line.substring(i + separatorLen);
+                    continue parseField;
+                }
+                break parseField;
+            } else {
+                line = line.substring(quoteLen);
+                for(;;){
+                    const i = line.indexOf(quote);
+                    if (i >= 0) {
+                        recordBuffer += line.substring(0, i);
+                        line = line.substring(i + quoteLen);
+                        if (line.startsWith(quote)) {
+                            recordBuffer += quote;
+                            line = line.substring(quoteLen);
+                        } else if (line.startsWith(this.#options.separator)) {
+                            line = line.substring(separatorLen);
+                            fieldIndexes.push(recordBuffer.length);
+                            continue parseField;
+                        } else if (0 === line.length) {
+                            fieldIndexes.push(recordBuffer.length);
+                            break parseField;
+                        } else if (this.#options.lazyQuotes) {
+                            recordBuffer += quote;
+                        } else {
+                            const col = runeCount(fullLine.slice(0, fullLine.length - line.length - quoteLen));
+                            quoteError = new ParseError(startLine + 1, lineIndex, col, ERR_QUOTE);
+                            break parseField;
+                        }
+                    } else if (line.length > 0 || !this.#isEOF()) {
+                        recordBuffer += line;
+                        const r = this.#readLine();
+                        lineIndex++;
+                        line = r ?? "";
+                        fullLine = line;
+                        if (r === null) {
+                            if (!this.#options.lazyQuotes) {
+                                const col = runeCount(fullLine);
+                                quoteError = new ParseError(startLine + 1, lineIndex, col, ERR_QUOTE);
+                                break parseField;
+                            }
+                            fieldIndexes.push(recordBuffer.length);
+                            break parseField;
+                        }
+                        recordBuffer += "\n";
+                    } else {
+                        if (!this.#options.lazyQuotes) {
+                            const col = runeCount(fullLine);
+                            quoteError = new ParseError(startLine + 1, lineIndex, col, ERR_QUOTE);
+                            break parseField;
+                        }
+                        fieldIndexes.push(recordBuffer.length);
+                        break parseField;
+                    }
+                }
+            }
+        }
+        if (quoteError) {
+            throw quoteError;
+        }
+        const result = [];
+        let preIdx = 0;
+        for (const i of fieldIndexes){
+            result.push(recordBuffer.slice(preIdx, i));
+            preIdx = i;
+        }
+        return result;
+    }
+    parse(input) {
+        this.#input = input.startsWith(BYTE_ORDER_MARK) ? input.slice(1) : input;
+        this.#cursor = 0;
+        const result = [];
+        let _nbFields;
+        let lineResult;
+        let first = true;
+        let lineIndex = 0;
+        const INVALID_RUNE = [
+            "\r",
+            "\n",
+            '"'
+        ];
+        const options = this.#options;
+        if (INVALID_RUNE.includes(options.separator) || typeof options.comment === "string" && INVALID_RUNE.includes(options.comment) || options.separator === options.comment) {
+            throw new Error(ERR_INVALID_DELIM);
+        }
+        for(;;){
+            const r = this.#parseRecord(lineIndex);
+            if (r === null) break;
+            lineResult = r;
+            lineIndex++;
+            if (first) {
+                first = false;
+                if (options.fieldsPerRecord !== undefined) {
+                    if (options.fieldsPerRecord === 0) {
+                        _nbFields = lineResult.length;
+                    } else {
+                        _nbFields = options.fieldsPerRecord;
+                    }
+                }
+            }
+            if (lineResult.length > 0) {
+                if (_nbFields && _nbFields !== lineResult.length) {
+                    throw new ParseError(lineIndex, lineIndex, null, ERR_FIELD_COUNT);
+                }
+                result.push(lineResult);
+            }
+        }
+        return result;
+    }
+}
+function parse3(input, opt = {
+    skipFirstRow: false
+}) {
+    const parser = new Parser(opt);
+    const r = parser.parse(input);
+    if (opt.skipFirstRow || opt.columns) {
+        let headers = [];
+        if (opt.skipFirstRow) {
+            const head = r.shift();
+            if (head === undefined) throw new TypeError("Headers must be defined");
+            headers = head;
+        }
+        if (opt.columns) {
+            headers = opt.columns;
+        }
+        const firstLineIndex = opt.skipFirstRow ? 1 : 0;
+        return r.map((row, i)=>{
+            return convertRowToObject(row, headers, firstLineIndex + i);
+        });
+    }
+    return r;
+}
 const normalizeEOL = (str)=>str.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-const isContentfulRow = (row)=>!!(row && !/^\s*$/.test(row));
 function parseCSV(contents) {
     const columns = new ColumnsMap();
     const issues = [];
-    const rows = normalizeEOL(contents).split('\n').filter(isContentfulRow).map((str)=>{
-        const matches = str.match(/".*"/);
-        matches?.forEach((match)=>{
-            const newMatch = match.replace(",", "[REPLACE]");
-            str = str.replace(match, newMatch);
+    const normalizedStr = normalizeEOL(contents);
+    try {
+        const rows = parse3(normalizedStr);
+        const headers = rows.length ? rows[0] : [];
+        if (headers.length === 0) issues.push({
+            'issue': 'NoHeader',
+            'message': null
         });
-        return str.split(',').map((x)=>x.replace("[REPLACE]", ","));
-    });
-    const headers = rows.length ? rows[0] : [];
-    if (headers.length === 0) issues.push('NoHeader');
-    else {
-        if (!rows.slice(1).every((row)=>row.length === headers.length)) issues.push("HeaderRowMismatch");
-    }
-    headers.map((x)=>{
-        columns[x] = [];
-    });
-    for(let i = 1; i < rows.length; i++){
-        for(let j = 0; j < headers.length; j++){
-            const col = columns[headers[j]];
-            col.push(rows[i][j]);
+        else {
+            if (!rows.slice(1).every((row)=>row.length === headers.length)) issues.push({
+                'issue': 'HeaderRowMismatch',
+                'message': null
+            });
         }
+        headers.map((x)=>{
+            columns[x] = [];
+        });
+        for(let i = 1; i < rows.length; i++){
+            for(let j = 0; j < headers.length; j++){
+                const col = columns[headers[j]];
+                col.push(rows[i][j]);
+            }
+        }
+        if (Object.keys(columns).includes("row_id") && [
+            ...new Set(columns["row_id"])
+        ].length !== columns["row_id"].length) issues.push({
+            'issue': 'RowidValuesNotUnique',
+            'message': null
+        });
+    } catch (error) {
+        issues.push({
+            'issue': 'CSVFormattingError',
+            'message': error.message
+        });
     }
-    if (Object.keys(columns).includes("row_id") && [
-        ...new Set(columns["row_id"])
-    ].length !== columns["row_id"].length) issues.push("RowidValuesNotUnique");
     const response = {
         'columns': columns,
         'issues': issues
@@ -2471,9 +2727,18 @@ class psychDSContext {
     }
     reportCSVIssues(issues) {
         issues.forEach((issue)=>{
-            this.issues.addSchemaIssue(issue, [
-                this.file
-            ]);
+            if (issue.message) {
+                this.issues.addSchemaIssue(issue.issue, [
+                    {
+                        ...this.file,
+                        evidence: issue.message
+                    }
+                ]);
+            } else {
+                this.issues.addSchemaIssue(issue.issue, [
+                    this.file
+                ]);
+            }
         });
     }
     async asyncLoads() {
@@ -2516,7 +2781,6 @@ async function validate(fileTree, options) {
     if (ddFile) {
         try {
             const description = ddFile.expanded;
-            console.log(description)
             dsContext = new psychDSContextDataset(options, ddFile, description);
         } catch (_error) {
             dsContext = new psychDSContextDataset(options, ddFile);
