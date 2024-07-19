@@ -1444,7 +1444,7 @@ async function _readFileTree(dirDict, name, relativePath, ignore, parent, contex
             file.fileText = dirDict[key]['text'].replace('http://schema.org','https://schema.org').replace('http://www.schema.org','https://schema.org')
 
             if (key === '.psychdsignore') {
-                ignore.add(dirDict[key][lines]);
+                ignore.add(dirDict[key]['lines']);
             }
             if (key.endsWith('.json')) {
                 let json = {};
