@@ -112,6 +112,11 @@ export default function Validator() {
 
     return (
         <div class="container pl-16 pr-auto text-left">
+             <div class="border rounded-2xl bg-gray-100 border-black border-solid p-6">
+                 <h2 class="text-left">For help generating your metadata files, try the <a target="_blank" style="color:blue" href="https://psych-ds.github.io/cedar-wizard-psychds/">Cedar Metadata Wizard</a></h2>
+
+             </div>
+             <br></br>
             <div class="border rounded-2xl bg-gray-100 border-black border-solid p-6">
                 <h2 class="text-left"><b>Select a Psych-DS dataset to validate</b></h2>
                 <div class="flex items-center">
