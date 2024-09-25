@@ -30,7 +30,19 @@
     "tailwindcss/": "npm:/tailwindcss@3.4.1/",
     "tailwindcss/plugin": "npm:/tailwindcss@3.4.1/plugin.js",
     "$std/": "https://deno.land/std@0.216.0/",
-    "/jsonld": "npm:jsonld"
+    "url-parse":"npm:url-parse",
+    "/jsonld": "npm:jsonld",
+    "canonicalize": "npm:canonicalize@1.0.8",
+    "csv-parse/sync": "https://esm.sh/csv-parse@5.5.2/sync",
+    "commander": "https://esm.sh/commander@9.4.0",
+    "chalk": "https://esm.sh/chalk@5.0.1",
+    "cli-table3": "https://esm.sh/cli-table3@0.6.3",
+    "eventemitter3":"npm:eventemitter3",
+    "winston":"npm:winston",
+    "jsonld": "npm:jsonld@8.3.2",
+    "rdf-canonize": "https://esm.sh/rdf-canonize@3.4.0",
+    "bindings": "./empty-module.js"
+    
   },
   "compilerOptions": {
     "jsx": "react-jsx",
