@@ -5595,12 +5595,12 @@ async function validate(fileTree, options) {
       options.emitter?.emit("check-for-csv", { success: true });
     }
   }
-  emitCheck("csv-keywords", ["KEYWORD_FORMATTING_ERROR", "UNOFFICIAL_KEYWORD_ERROR"]);
+  emitCheck("csv-keywords", ["FILENAME_KEYWORD_FORMATTING_ERROR", "FILENAME_UNOFFICIAL_KEYWORD_ERROR"]);
   emitCheck("csv-parse", ["CSV_FORMATTING_ERROR"]);
-  emitCheck("csv-header", ["NO_HEADER"]);
-  emitCheck("csv-nomismatch", ["HEADER_ROW_MISMATCH"]);
+  emitCheck("csv-header", ["CSV_HEADER_MISSING"]);
+  emitCheck("csv-nomismatch", ["CSV_HEADER_LENGTH_MISMATCH"]);
   emitCheck("csv-rowid", ["ROWID_VALUES_NOT_UNIQUE"]);
-  emitCheck("check-variableMeasured", ["CSV_COLUMN_MISSING"]);
+  emitCheck("check-variableMeasured", ["CSV_COLUMN_MISSING_FROM_METADATA"]);
   checkDirRules(schema, rulesRecord, dsContext.baseDirs);
   checkMissingRules(schema, rulesRecord, issues);
   emitCheck("find-metadata", ["MISSING_DATASET_DESCRIPTION"]);
