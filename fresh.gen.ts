@@ -4,6 +4,7 @@
 
 import * as $_app from "./routes/_app.tsx";
 import * as $index from "./routes/index.tsx";
+import * as $FileTreeView from "./islands/FileTreeView.tsx";
 import * as $Output from "./islands/Output.tsx";
 import * as $Validator from "./islands/Validator.tsx";
 import { type Manifest } from "$fresh/server.ts";
@@ -14,6 +15,7 @@ const manifest = {
     "./routes/index.tsx": $index,
   },
   islands: {
+    "./islands/FileTreeView.tsx": $FileTreeView,
     "./islands/Output.tsx": $Output,
     "./islands/Validator.tsx": $Validator,
   },

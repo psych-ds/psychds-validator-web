@@ -1,200 +1,249 @@
+import { useEffect, useState, useRef } from "preact/hooks";
+import Output from './Output.tsx';
+import FileTreeView from './FileTreeView.tsx';
+import EventEmitter from "https://esm.sh/eventemitter3@5.0.1";
 
-import Output from './Output.tsx'
-import { useEffect, useState } from "preact/hooks";
-import { psychDSFileDeno, FileIgnoreRules,_readFileTree,readFileTree } from "../static/fileio.js";
-import { validate } from "../static/psychds-validator.js";
-import { DatasetIssues } from "../static/datasetIssues.js"
+// Define global types for the window object
+declare global {
+    interface Window {
+        validateWeb: (fileTree: any, options: any) => Promise<any>;
+        ValidationProgressTracker: new (eventEmitter: EventEmitter) => any;
+    }
+}
 
+// Define types for file tree structure
 interface FileEntry {
     name: string;
-    lines: string[];
-    text: string;
+    file: object;
     type: 'file';
 }
 
 interface DirectoryEntry {
     name: string;
     type: 'directory';
-    contents: object; // Recursive type definition
+    contents: { [key: string]: TreeEntry };
 }
 
 type TreeEntry = FileEntry | DirectoryEntry;
 
-class FileTree {
-    path: string;
-    name: string;
-    files: psychDSFileDeno[];
-    directories: FileTree[];
-    parent: FileTree|null;
-    constructor(path: string, name:string, parent:FileTree|null){
-        this.path = path;
-        this.files = [];
-        this.directories = [];
-        this.name = name;
-        this.parent = parent;
+function anyInMap<K, V>(map: Map<K, V>, condition: (value: V, key: K) => boolean): boolean {
+    for (const [key, value] of map.entries()) {
+      if (condition(value, key)) {
+        return true;
+      }
     }
-    contains(parts: string[]): boolean {
-        if (parts.length === 0) {
-            return false;
-        } else if (parts.length === 1) {
-            return this.files.some((x)=>x.name === parts[0]);
-        } else if (parts.length > 1) {
-            const nextDir = this.directories.find((x)=>x.name === parts[0]);
-            if (nextDir) {
-                return nextDir.contains(parts.slice(1, parts.length));
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-}
+    return false;
+  }
 
-async function readDirectory(dirHandle: FileSystemDirectoryHandle) {
-    const tree: { [key:string]: TreeEntry} = {};
-
-    for await (const entry of dirHandle.values()) {
-        if (entry.kind === 'file') {
-            const fileHandle = await dirHandle.getFileHandle(entry.name);
-            const file = await fileHandle.getFile();
-            const contents = await file.text();
-            const lines = contents.split('\n');
-            tree[entry.name] = {
-                name: entry.name,
-                lines:lines,
-                text:contents,
-                type: 'file'
-            };
-        } else if (entry.kind === 'directory') {
-            const subdirHandle = await dirHandle.getDirectoryHandle(entry.name);
-            tree[entry.name] = {
-                name: entry.name,
-                type: 'directory',
-                contents: await readDirectory(subdirHandle)
-            };
-        }
-    }
-
-    return tree as { [key:string]: TreeEntry};
-}
-/*
-async function _readFileTree(dirDict:{ [key:string]: TreeEntry}, name:string, relativePath:string, ignore:FileIgnoreRules, parent:FileTree|null, context?: object | null) {
-    const tree = new FileTree(relativePath, name, parent);
-    for ( const key in dirDict){
-        const path = (relativePath === '/') ? `/${key}` : `${relativePath}/${key}`
-        if(dirDict[key]['type'] === 'file'){
-            
-            const file = new psychDSFileDeno(null,path,ignore)
-            file.fileText = (dirDict[key] as FileEntry)['text']
-            if(key === ".psychdsignore"){
-                ignore.add((dirDict[key] as FileEntry)['lines'])
-            }
-            if(key.endsWith('.json')){
-                let json = {}
-                let exp = []
-                try{
-                    json = await JSON.parse(file.fileText)
-                    if(!parent && key.endsWith('dataset_description.json') && '@context' in json){
-                        context = json['@context'] as object
-                    }
-                    else if(context){
-                        json = {
-                            ...json,
-                            '@context': context
-                        }
-                    }
-                }
-                catch(error){
-                    file.issueInfo.push({
-                        key: 'InvalidJsonFormatting'
-                    })
-                }
-                try{
-                    exp = await jsonld.expand(json)
-                    if (exp.length > 0)
-                        file.expanded = exp[0]
-                }
-                catch(error){
-                    file.issueInfo.push({
-                        key: 'InvalidJsonldSyntax',
-                        evidence: `${error.message.split(';')[1]}`
-                      })
-                }
-            }
-            tree.files.push(file)
-        }
-        else{
-            const dirTree = await _readFileTree((dirDict[key] as DirectoryEntry)['contents'] as { [key:string]: TreeEntry},key,path,ignore,tree,context)
-            tree.directories.push(dirTree)
-        }
-    }
-    return tree;
-}*/
-
-
-
+// Main Validator component
 export default function Validator() {
-    const [issues, setIssues] = useState({
-        'errors':[],
-        'warnings':[]
-    });
+    // State for validation results and UI control
+    const [issues, setIssues] = useState({ errors: [], warnings: [] });
     const [validationComplete, setValidationComplete] = useState(false);
     const [validationResult, setValidationResult] = useState(false);
     const [showWarnings, setShowWarnings] = useState(false);
-    const [verbose, setVerbose] = useState(false);
+    const [useEvents, setUseEvents] = useState(true);
+    const [steps, setSteps] = useState([]);
+    const [isValidating, setIsValidating] = useState(false);
+    const [stepStatus, setStepStatus] = useState(new Map());
+    const [fileTree, setFileTree] = useState<{ [key: string]: TreeEntry }>({});
+    const [isFileTreeExpanded, setIsFileTreeExpanded] = useState(false);
+
+    useEffect(() => {
+        const eventEmitter = new EventEmitter()
+        const progress = new window.psychDSValidator.ValidationProgressTracker(eventEmitter);
+        setSteps(progress.steps);
+        
+      }, []);
+    
+    // Reference for file input
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
 
+    // Function to handle file validation
     const handleValidate = async (event: Event) => {
         event.preventDefault();
-        // @ts-ignore: reason
-        const dirHandle = await globalThis.showDirectoryPicker();
-        const dirDict = await readDirectory(dirHandle);
-        const fileTree = await readFileTree(dirDict)
-        const result = await validate(fileTree,{})
-        console.log(result)
-        setValidationComplete(true);
-        setValidationResult(result.valid)
-        setIssues(result.issues.formatOutput())
-    }
+        const input = event.target as HTMLInputElement;
+        const files = input.files;
 
+        if (!files || files.length === 0) {
+            console.error("No files selected");
+            return;
+        }
+
+        setIsValidating(true);
+        setValidationComplete(false);
+
+        // Build file tree structure
+        const tree: { [key: string]: TreeEntry } = {};
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const path = file.webkitRelativePath.split('/');
+            path.shift(); // Skip the top-level folder
+            
+            if (path.length === 0) continue;
+            
+            let currentLevel = tree;
+            for (let j = 0; j < path.length; j++) {
+                const part = path[j];
+                if (j === path.length - 1) {
+                    // It's a file
+                    currentLevel[part] = { name: part, type: 'file', file: file };
+                } else {
+                    // It's a directory
+                    if (!currentLevel[part]) {
+                        currentLevel[part] = { name: part, type: 'directory', contents: {} };
+                    }
+                    currentLevel = (currentLevel[part] as DirectoryEntry).contents;
+                }
+            }
+        }
+
+        setFileTree(tree);
+
+        try {
+            const eventEmitter = new EventEmitter()
+            const progress = new window.psychDSValidator.ValidationProgressTracker(eventEmitter);
+            setStepStatus(progress.stepStatus)
+
+            // Handle step status changes
+            eventEmitter.on('stepStatusChange', ({ stepStatus: newStepStatus, superStep }) => {
+                console.log('Step status change:', newStepStatus, 'Super step:', superStep);
+                let prevComplete = true
+                // Update step status
+                setStepStatus(prevStatus => {
+                    const updatedStatus = new Map(prevStatus);
+                    newStepStatus.forEach(([key, value]) => {
+                        const thisSup = progress.steps.filter((val) => val.key == key)[0]
+                        if (prevComplete)
+                            updatedStatus.set(key, value);
+                        if (!(value.complete && value.success) && (!thisSup || thisSup.subSteps.length == 0)){
+                            prevComplete = false
+                            setValidationResult(false)
+                        }
+
+                    });
+                    if (newStepStatus.every(([key, value]) => value.success && value.complete)) {
+                        setValidationComplete(true)
+                        setValidationResult(true)
+                    }
+                    return updatedStatus;
+                });
+              
+                setSteps(progress.steps)
+            });
+
+            // Perform validation
+            const result = await window.psychDSValidator.validateWeb(tree, {emitter: eventEmitter});
+
+            // Update state with validation results
+            setValidationComplete(true);
+            if(!useEvents){
+                setValidationResult(result.valid);
+                setIssues(result.issues.formatOutput());
+            }
+        } catch (error) {
+            console.error("Error during validation:", error);
+        } finally {
+            setIsValidating(false);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
+    };
+
+    // Event handlers for UI controls
     const changeShowWarnings = (event: Event) => {
-        setShowWarnings((event.target as HTMLInputElement).checked)
-    }
+        setShowWarnings((event.target as HTMLInputElement).checked);
+    };
 
-    const changeVerbose = (event: Event) => {
-        setVerbose((event.target as HTMLInputElement).checked)
-    }
+    const changeUseEvents = (event: Event) => {
+        const isChecked = (event.target as HTMLInputElement).checked;
+        setUseEvents(isChecked);
+    };
 
+    // Render component
     return (
+        <div class="container pl-16 pr-auto text-left">
+            {/* Cedar Metadata Wizard link */}
+            <div class="border rounded-2xl bg-gray-100 border-black border-solid p-6">
+                <ul>
+                    <li>
+                        <h2 class="text-left">For help structuring your Psych-DS dataset, try the <a target="_blank" style="color:blue" href="https://psychds-docs.readthedocs.io/en/latest/Guides/1_getting_started/">Getting Started Guide</a></h2>
+                    </li>
+                    <br/>
 
-        <div class="container pl-16 pr-auto text-left  ">
+                    <li>
+                        <h2 class="text-left">For help generating your metadata files, try the <a target="_blank" style="color:blue" href="https://psych-ds.github.io/cedar-wizard-psychds/">Cedar Metadata Wizard</a></h2>
+                    </li>
+
+                </ul>
+            </div>
+            <br />
+            {/* File selection and options */}
             <div class="border rounded-2xl bg-gray-100 border-black border-solid p-6">
                 <h2 class="text-left"><b>Select a Psych-DS dataset to validate</b></h2>
-                {/* @ts-ignore */}
-                <input class="pb-2" type='file' directory webkitdirectory
-                onClick={handleValidate}
-                ></input>
+                <div class="flex items-center">
+                    <input 
+                        ref={fileInputRef}
+                        class="pb-2" 
+                        type='file' 
+                        webkitdirectory="true"
+                        directory=""
+                        multiple
+                        onChange={handleValidate}
+                        disabled={isValidating}
+                    />
+                    {isValidating && (
+                        <div class="flex items-center ml-4">
+                            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900 mr-2"></div>
+                            <span>Validating dataset... this may take a moment</span>
+                        </div>
+                    )}
+                </div>
+                <h2><i>Note: Although the word "upload" may appear when selecting a folder, no files will be sent to our server or stored in any way.</i></h2>
                 <hr class="pt-2 pb-2"/>
                 <form>
-                    <label>
-                        <b>
-                            Options:
-                        </b>
-                    </label>
-                    <input id="showWarnings" class="mr-2 ml-2" type="checkbox" name="showWarnings" onChange={changeShowWarnings}></input>
-                    <label for="showWarnings">
-                        Show Warnings
-                    </label>
-                    <input id="verbose" class="mr-2 ml-2" type="checkbox" name="verbose" onChange={changeVerbose}></input>
-                    <label for="verbose">
-                        Verbose
-                    </label>
+                    <label><b>Options:</b></label>
+                    <input id="showWarnings" class="mr-2 ml-2" type="checkbox" name="showWarnings" onChange={changeShowWarnings} />
+                    <label for="showWarnings">Show Warnings</label>
+                    <input 
+                        id="useEvents" 
+                        class="mr-2 ml-2" 
+                        type="checkbox" 
+                        name="useEvents" 
+                        onChange={changeUseEvents} 
+                        checked={useEvents}
+                    />
+                    <label for="useEvents">Show Progress</label>
                 </form>
             </div>
             <br/>
+            <div class="rounded-2xl border bg-gray-100 border-black border-solid p-6 mb-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold">Dataset File Structure:</h3>
+                    <button 
+                        onClick={() => setIsFileTreeExpanded(!isFileTreeExpanded)}
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    >
+                        {isFileTreeExpanded ? 'Collapse' : 'Expand'}
+                    </button>
+                </div>
+                {isFileTreeExpanded && <FileTreeView tree={fileTree} />}
+            </div>
+            {/* Output component */}
             <div class="rounded-2xl border bg-gray-100 border-black border-solid p-6 max-h-screen overflow-auto">
-                {validationComplete && <Output issues={issues} validationResult={validationResult} showWarnings={showWarnings} verbose={verbose}/>}
+                {(validationComplete || useEvents) && 
+                    <Output 
+                        issues={issues} 
+                        validationComplete={validationComplete}
+                        validationResult={validationResult} 
+                        showWarnings={showWarnings}
+                        useEvents={useEvents} 
+                        stepStatus={stepStatus} 
+                        steps={steps}
+                    />
+                }
             </div>
         </div>
     );
