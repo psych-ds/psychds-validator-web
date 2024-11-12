@@ -187,7 +187,7 @@ export default function Output({ issues, validationComplete, validationResult, s
                       <summary>
                         {file.file.path}
                       </summary>
-                      {file.evidence && 
+                      {file.evidence != "" && 
                         <div class=' border border-black border-solid mb-6 p-6'>
                           {file.evidence}
                         </div>

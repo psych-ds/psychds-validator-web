@@ -13,6 +13,11 @@ jobs:
     permissions:
       id-token: write # Needed for auth with Deno Deploy
       contents: read # Needed to clone the repository
+    
+    env:
+      GITHUB_APP_ID: ${{ secrets.GH_APP_ID }}
+      GITHUB_INSTALLATION_ID: ${{ secrets.GH_INSTALLATION_ID }}
+      GITHUB_PRIVATE_KEY: ${{ secrets.GH_PRIVATE_KEY }}
 
     steps:
       - name: Clone repository
