@@ -169,7 +169,7 @@ export default function Validator() {
             <div class="border rounded-2xl bg-gray-100 border-black border-solid p-6">
                 <ul>
                     <li>
-                        <h2 class="text-left">For help structuring your Psych-DS dataset, try the <a target="_blank" style="color:blue" href="https://psychds-docs.readthedocs.io/en/latest/Guides/1_getting_started/">Getting Started Guide</a></h2>
+                        <h2 class="text-left">For help structuring your Psych-DS dataset, try the <a target="_blank" style="color:blue" href="https://psychds-docs.readthedocs.io/en/latest/guides/1_getting_started/">Getting Started Guide</a></h2>
                     </li>
                     <br/>
 
