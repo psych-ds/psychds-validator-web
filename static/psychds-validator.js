@@ -26,7 +26,7 @@ var __privateSet = (obj, member, value, setter) => {
   return value;
 };
 
-// ../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/dist/esm/sync.js
+// node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/dist/esm/sync.js
 var sync_exports = {};
 __export(sync_exports, {
   CsvError: () => CsvError,
@@ -874,7 +874,7 @@ function isSlowBuffer(obj) {
 }
 var global$1, lookup, revLookup, Arr, inited, toString, isArray, INSPECT_MAX_BYTES, MAX_ARGUMENTS_LENGTH, INVALID_BASE64_RE, CsvError, is_object, normalize_columns_array, ResizeableBuffer, np, cr$1, nl$1, space, tab, init_state, underscore, normalize_options, isRecordEmpty, cr, nl, boms, transform, parse;
 var init_sync = __esm({
-  "../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/dist/esm/sync.js"() {
+  "node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/dist/esm/sync.js"() {
     global$1 = typeof window !== "undefined" ? window : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};
     lookup = [];
     revLookup = [];
@@ -2932,10 +2932,10 @@ var init_sync = __esm({
   }
 });
 
-// ../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/api/CsvError.js
+// node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/api/CsvError.js
 var CsvError2;
 var init_CsvError = __esm({
-  "../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/api/CsvError.js"() {
+  "node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/api/CsvError.js"() {
     CsvError2 = class extends Error {
       constructor(code, message, options, ...contexts) {
         if (Array.isArray(message))
@@ -2956,20 +2956,20 @@ var init_CsvError = __esm({
   }
 });
 
-// ../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/utils/is_object.js
+// node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/utils/is_object.js
 var is_object2;
 var init_is_object = __esm({
-  "../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/utils/is_object.js"() {
+  "node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/utils/is_object.js"() {
     is_object2 = function(obj) {
       return typeof obj === "object" && obj !== null && !Array.isArray(obj);
     };
   }
 });
 
-// ../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/api/normalize_columns_array.js
+// node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/api/normalize_columns_array.js
 var normalize_columns_array2;
 var init_normalize_columns_array = __esm({
-  "../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/api/normalize_columns_array.js"() {
+  "node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/api/normalize_columns_array.js"() {
     init_CsvError();
     init_is_object();
     normalize_columns_array2 = function(columns) {
@@ -3002,10 +3002,10 @@ var init_normalize_columns_array = __esm({
   }
 });
 
-// ../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/utils/ResizeableBuffer.js
+// node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/utils/ResizeableBuffer.js
 var ResizeableBuffer2, ResizeableBuffer_default;
 var init_ResizeableBuffer = __esm({
-  "../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/utils/ResizeableBuffer.js"() {
+  "node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/utils/ResizeableBuffer.js"() {
     ResizeableBuffer2 = class {
       constructor(size = 100) {
         this.size = size;
@@ -3071,10 +3071,10 @@ var init_ResizeableBuffer = __esm({
   }
 });
 
-// ../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/api/init_state.js
+// node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/api/init_state.js
 var np2, cr2, nl2, space2, tab2, init_state2;
 var init_init_state = __esm({
-  "../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/api/init_state.js"() {
+  "node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/api/init_state.js"() {
     init_ResizeableBuffer();
     np2 = 12;
     cr2 = 13;
@@ -3126,10 +3126,10 @@ var init_init_state = __esm({
   }
 });
 
-// ../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/utils/underscore.js
+// node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/utils/underscore.js
 var underscore2;
 var init_underscore = __esm({
-  "../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/utils/underscore.js"() {
+  "node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/utils/underscore.js"() {
     underscore2 = function(str) {
       return str.replace(/([A-Z])/g, function(_, match) {
         return "_" + match.toLowerCase();
@@ -3138,10 +3138,10 @@ var init_underscore = __esm({
   }
 });
 
-// ../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/api/normalize_options.js
+// node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/api/normalize_options.js
 var normalize_options2;
 var init_normalize_options = __esm({
-  "../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/api/normalize_options.js"() {
+  "node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/api/normalize_options.js"() {
     init_normalize_columns_array();
     init_CsvError();
     init_underscore();
@@ -3547,10 +3547,10 @@ var init_normalize_options = __esm({
   }
 });
 
-// ../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/api/index.js
+// node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/api/index.js
 var isRecordEmpty2, cr3, nl3, boms2, transform2;
 var init_api = __esm({
-  "../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/api/index.js"() {
+  "node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/api/index.js"() {
     init_normalize_columns_array();
     init_init_state();
     init_normalize_options();
@@ -4251,7 +4251,7 @@ var init_api = __esm({
   }
 });
 
-// ../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/sync.js
+// node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/sync.js
 var sync_exports2 = {};
 __export(sync_exports2, {
   CsvError: () => CsvError2,
@@ -4259,7 +4259,7 @@ __export(sync_exports2, {
 });
 var parse2;
 var init_sync2 = __esm({
-  "../../../Library/Caches/deno/deno_esbuild/csv-parse@5.5.6/node_modules/csv-parse/lib/sync.js"() {
+  "node_modules/.deno/csv-parse@5.5.6/node_modules/csv-parse/lib/sync.js"() {
     init_api();
     parse2 = function(data, opts = {}) {
       if (typeof data === "string") {
@@ -4309,8 +4309,9 @@ function checkDirRules(schema, rulesRecord, baseDirs) {
     return key.startsWith("rules.files.common.core") && !rulesRecord[key];
   }).map((key) => {
     const node = schema[key];
-    if (node.directory === true && baseDirs.includes(node.path))
+    if (node.directory === true && baseDirs.includes(node.path)) {
       rulesRecord[key] = true;
+    }
   });
 }
 function findFileRules(schema, rulesRecord) {
@@ -4359,22 +4360,21 @@ function findRuleMatches(schema, context) {
 function checkFileRules(arbitraryNesting, hasSuffix, node, context) {
   let baseDirCond = null;
   let suffixStemCond = null;
-  if (arbitraryNesting)
+  if (arbitraryNesting) {
     baseDirCond = context.baseDir === node.baseDir;
-  else {
-    if (context.baseDir === "/")
+  } else {
+    if (context.baseDir === "/") {
       baseDirCond = context.path === `/${context.file.name}`;
-    else
+    } else {
       baseDirCond = context.path === `/${node.baseDir}/${context.file.name}`;
+    }
   }
-  if (hasSuffix)
+  if (hasSuffix) {
     suffixStemCond = context.suffix === node.suffix;
-  else
+  } else {
     suffixStemCond = context.file.name.startsWith(node.stem);
-  if (baseDirCond && node.extensions.includes(context.extension) && suffixStemCond)
-    return true;
-  else
-    return false;
+  }
+  return baseDirCond && node.extensions.includes(context.extension) && suffixStemCond;
 }
 function _findRuleMatches(node, path2, context) {
   if ("arbitraryNesting" in node) {
@@ -4438,10 +4438,21 @@ var issueFile = (issue, f) => {
   };
 };
 var DatasetIssues = class extends Map {
+  /**
+   * Creates a new dataset issues collection
+   * @param schema - Optional schema containing issue definitions
+   */
   constructor(schema) {
     super();
     this.schema = schema ? schema : {};
   }
+  /**
+   * Adds a new issue or updates an existing one
+   * If an issue with the same key exists, merges the file references
+   *
+   * @param params - Issue parameters
+   * @returns The added or updated issue
+   */
   add({
     key,
     reason,
@@ -4467,14 +4478,24 @@ var DatasetIssues = class extends Map {
       return newIssue;
     }
   }
-  // Shorthand to test if an issue has occurred
+  /**
+   * Checks if a specific issue exists
+   * @param key - Issue identifier to check
+   * @returns True if the issue exists
+   */
   hasIssue({ key }) {
     if (this.has(key)) {
       return true;
     }
     return false;
   }
-  //adds issue from errors.yaml file of schema model
+  /**
+   * Adds an issue using metadata from the schema
+   * Retrieves issue details from schema's error definitions
+   *
+   * @param key - Schema error key
+   * @param files - Array of affected files
+   */
   addSchemaIssue(key, files) {
     if (this.schema) {
       this.add({
@@ -4486,6 +4507,11 @@ var DatasetIssues = class extends Map {
       });
     }
   }
+  /**
+   * Finds all issues affecting a specific file
+   * @param path - File path to check
+   * @returns Array of issues affecting the file
+   */
   fileInIssues(path2) {
     const matchingIssues = [];
     for (const [_, issue] of this) {
@@ -4496,14 +4522,19 @@ var DatasetIssues = class extends Map {
     return matchingIssues;
   }
   /**
-   * Report Issue keys related to a file
-   * @param path File path relative to dataset root
-   * @returns Array of matching issue keys
+   * Gets issue keys for issues affecting a file
+   * @param path - File path relative to dataset root
+   * @returns Array of issue keys
    */
   getFileIssueKeys(path2) {
     return this.fileInIssues(path2).map((issue) => issue.key);
   }
-  //removes any issues that pertain to objects that were not founds
+  /**
+   * Removes issues for objects that weren't found
+   * Filters based on rule satisfaction record
+   *
+   * @param rulesRecord - Record of which rules were satisfied
+   */
   filterIssues(rulesRecord) {
     for (const [_, issue] of this) {
       if (!issue.requires.every((req) => rulesRecord[req])) {
@@ -4512,9 +4543,11 @@ var DatasetIssues = class extends Map {
     }
   }
   /**
-   * Format output
+   * Formats issues for output
+   * Converts internal representation to standardized output format
+   * Separates issues by severity (errors vs warnings)
    *
-   * Converts from new internal representation to old IssueOutput structure
+   * @returns Formatted issues object with separate error and warning arrays
    */
   formatOutput() {
     const output = {
@@ -4542,15 +4575,22 @@ var DatasetIssues = class extends Map {
 };
 
 // src/utils/platform.ts
-var isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";
+//import process from "node:process";
+var isBrowser = typeof window !== "undefined" && // deno-lint-ignore no-explicit-any
+typeof window.document !== "undefined";
 var isNode = typeof process !== "undefined" && process.versions != null && process.versions.node != null;
 var isDeno = typeof Deno !== "undefined";
 var _path;
 var path = {
+  /** Resolves a sequence of paths into an absolute path */
   resolve: (...paths) => _path ? _path.resolve(...paths) : paths.join("/"),
+  /** Gets the last portion of a path */
   basename: (path2, ext) => _path ? _path.basename(path2, ext) : path2.split("/").pop() || "",
+  /** Joins all given path segments together */
   join: (...paths) => _path ? _path.join(...paths) : paths.join("/"),
+  /** Returns the directory name of a path */
   dirname: (path2) => _path ? _path.dirname(path2) : path2.split("/").slice(0, -1).join("/"),
+  /** Platform-independent path separator */
   sep: "/"
 };
 var browserLogger = {
@@ -4559,7 +4599,7 @@ var browserLogger = {
   error: console.error.bind(console),
   debug: console.debug.bind(console)
 };
-var readFile2 = async (filePath) => {
+var readFile = async (filePath) => {
   if (isBrowser) {
     const response = await fetch(filePath);
     return response.text();
@@ -4576,7 +4616,15 @@ var createReadStream = (filePath) => {
       async start(controller) {
         const fs = await import("node:fs");
         const readStream = fs.createReadStream(filePath);
-        readStream.on("data", (chunk) => controller.enqueue(new Uint8Array(chunk)));
+        readStream.on("data", (chunk) => {
+          if (chunk instanceof Uint8Array) {
+            controller.enqueue(chunk);
+          } else if (typeof chunk === "string") {
+            controller.enqueue(new TextEncoder().encode(chunk));
+          } else {
+            controller.enqueue(new TextEncoder().encode(String(chunk)));
+          }
+        });
         readStream.on("end", () => controller.close());
         readStream.on("error", (error2) => controller.error(error2));
       }
@@ -4679,7 +4727,9 @@ function keywordCheck(path2, schema, context) {
         );
       }
     }
-    if (!Object.keys(context.keywords).every((keyword) => keyword in schema["meta.context.context.properties.keywords.properties"])) {
+    if (!Object.keys(context.keywords).every(
+      (keyword) => keyword in schema["meta.context.context.properties.keywords.properties"]
+    )) {
       context.issues.addSchemaIssue(
         "FilenameUnofficialKeywordWarning",
         [context.file]
@@ -4749,7 +4799,7 @@ function evalCheck(src, context) {
   const safeContext = new Proxy(context, { has: safeHas, get: safeGet });
   try {
     return test(safeContext);
-  } catch (error2) {
+  } catch (_error) {
     return false;
   }
 }
@@ -4792,11 +4842,7 @@ function evalColumns(_rule, context, schema, schemaPath) {
     "typeIssues": [],
     "typeMissingIssues": []
   };
-  schemaCheck(
-    context,
-    schema,
-    schemaOrgIssues
-  );
+  schemaCheck(context, schema, schemaOrgIssues);
 }
 function evalJsonCheck(rule, context, _schema, schemaPath) {
   const issueKeys = [];
@@ -4831,10 +4877,11 @@ function schemaCheck(context, schema, issues) {
   if ("@type" in context.expandedSidecar) {
     if (context.expandedSidecar["@type"][0] !== `${schemaNamespace}Dataset`) {
       let issueFile2;
-      if (Object.keys(context.metadataProvenance).includes("@type"))
+      if (Object.keys(context.metadataProvenance).includes("@type")) {
         issueFile2 = context.metadataProvenance["@type"];
-      else
+      } else {
         issueFile2 = context.dataset.metadataFile;
+      }
       context.issues.addSchemaIssue("IncorrectDatasetType", [
         {
           ...issueFile2,
@@ -4854,7 +4901,14 @@ function schemaCheck(context, schema, issues) {
     ]);
     return;
   }
-  issues = _schemaCheck(context.expandedSidecar, context, schema, "", schemaNamespace, issues);
+  issues = _schemaCheck(
+    context.expandedSidecar,
+    context,
+    schema,
+    "",
+    schemaNamespace,
+    issues
+  );
   logSchemaIssues(context, issues);
 }
 function logSchemaIssues(context, issues) {
@@ -4862,10 +4916,11 @@ function logSchemaIssues(context, issues) {
     issues.termIssues.forEach((issue) => {
       const rootKey = issue.split(".")[1];
       let issueFile2;
-      if (Object.keys(context.metadataProvenance).includes(rootKey))
+      if (Object.keys(context.metadataProvenance).includes(rootKey)) {
         issueFile2 = context.metadataProvenance[rootKey];
-      else
+      } else {
         issueFile2 = context.dataset.metadataFile;
+      }
       context.issues.addSchemaIssue("InvalidSchemaorgProperty", [
         {
           ...issueFile2,
@@ -4880,10 +4935,11 @@ function logSchemaIssues(context, issues) {
     issues.typeIssues.forEach((issue) => {
       const rootKey = issue.split(".")[1];
       let issueFile2;
-      if (rootKey in context.metadataProvenance)
+      if (rootKey in context.metadataProvenance) {
         issueFile2 = context.metadataProvenance[rootKey];
-      else
+      } else {
         issueFile2 = context.dataset.metadataFile;
+      }
       context.issues.addSchemaIssue("InvalidObjectType", [
         {
           ...issueFile2,
@@ -4900,10 +4956,11 @@ function logSchemaIssues(context, issues) {
     issues.typeMissingIssues.forEach((issue) => {
       const rootKey = issue.split(".")[1];
       let issueFile2;
-      if (Object.keys(context.metadataProvenance).includes(rootKey))
+      if (Object.keys(context.metadataProvenance).includes(rootKey)) {
         issueFile2 = context.metadataProvenance[rootKey];
-      else
+      } else {
         issueFile2 = context.dataset.metadataFile;
+      }
       context.issues.addSchemaIssue("ObjectTypeMissing", [
         {
           ...issueFile2,
@@ -4919,10 +4976,11 @@ function logSchemaIssues(context, issues) {
     issues.unknownNamespaceIssues.forEach((issue) => {
       const rootKey = issue.split(".")[0];
       let issueFile2;
-      if (Object.keys(context.metadataProvenance).includes(rootKey))
+      if (Object.keys(context.metadataProvenance).includes(rootKey)) {
         issueFile2 = context.metadataProvenance[rootKey];
-      else
+      } else {
         issueFile2 = context.dataset.metadataFile;
+      }
       context.issues.addSchemaIssue("UnknownNamespace", [
         {
           ...issueFile2,
@@ -4938,12 +4996,16 @@ function _schemaCheck(node, context, schema, objectPath, nameSpace, issues) {
   let thisType = "";
   if ("@type" in node) {
     thisType = node["@type"][0];
-    superClassSlots = getSuperClassSlots(thisType, schema, nameSpace);
+    superClassSlots = getSuperClassSlots(
+      thisType,
+      schema,
+      nameSpace
+    );
   }
   for (const [key, value] of Object.entries(node)) {
-    if (key.startsWith("@"))
+    if (key.startsWith("@")) {
       continue;
-    else {
+    } else {
       if (!key.startsWith(nameSpace)) {
         issues.unknownNamespaceIssues.push(key);
         continue;
@@ -4953,13 +5015,21 @@ function _schemaCheck(node, context, schema, objectPath, nameSpace, issues) {
         if (property in schema[`schemaOrg.slots`]) {
           if ("range" in schema[`schemaOrg.slots.${property}`]) {
             range.push(schema[`schemaOrg.slots.${property}.range`]);
-            range = range.concat(getSubClassSlots(schema[`schemaOrg.slots.${property}.range`], schema, nameSpace));
+            range = range.concat(
+              getSubClassSlots(
+                schema[`schemaOrg.slots.${property}.range`],
+                schema,
+                nameSpace
+              )
+            );
           }
           if ("any_of" in schema[`schemaOrg.slots.${property}`]) {
             for (const ran of schema[`schemaOrg.slots.${property}`].any_of) {
               if ("range" in ran) {
                 range.push(ran.range);
-                range = range.concat(getSubClassSlots(ran.range, schema, nameSpace));
+                range = range.concat(
+                  getSubClassSlots(ran.range, schema, nameSpace)
+                );
               }
             }
           }
@@ -4974,11 +5044,24 @@ function _schemaCheck(node, context, schema, objectPath, nameSpace, issues) {
             if (!(subKeys.length === 1 && (subKeys.includes("@id") || subKeys.includes("@value")))) {
               if (subKeys.includes("@type")) {
                 const objType = Array.isArray(obj["@type"]) ? obj["@type"][0].replace(nameSpace, "") : obj["@type"].replace(nameSpace, "");
-                if (![...range, "Text", "URL"].includes(objType))
-                  issues.typeIssues.push(`${objectPath}.${property}${i === 0 ? "" : `[${i}]`}`);
-                issues = _schemaCheck(obj, context, schema, `${objectPath}.${property}`, nameSpace, issues);
-              } else
-                issues.typeMissingIssues.push(`${objectPath}.${property}${i === 0 ? "" : `[${i}]`}`);
+                if (![...range, "Text", "URL"].includes(objType)) {
+                  issues.typeIssues.push(
+                    `${objectPath}.${property}${i === 0 ? "" : `[${i}]`}`
+                  );
+                }
+                issues = _schemaCheck(
+                  obj,
+                  context,
+                  schema,
+                  `${objectPath}.${property}`,
+                  nameSpace,
+                  issues
+                );
+              } else {
+                issues.typeMissingIssues.push(
+                  `${objectPath}.${property}${i === 0 ? "" : `[${i}]`}`
+                );
+              }
             }
           }
         }
@@ -4988,19 +5071,13 @@ function _schemaCheck(node, context, schema, objectPath, nameSpace, issues) {
   return issues;
 }
 function getSuperClassSlots(type, schema, nameSpace) {
-  if (type.includes(nameSpace)) {
-    type = type.replace(nameSpace, "");
+  type = type.replace(nameSpace, "");
+  if (!(type in schema["schemaOrg.classes"])) {
+    return [];
   }
-  if (type in schema[`schemaOrg.classes`]) {
-    if ("is_a" in schema[`schemaOrg.classes.${type}`]) {
-      if ("slots" in schema[`schemaOrg.classes.${type}`]) {
-        return schema[`schemaOrg.classes.${type}.slots`].concat(getSuperClassSlots(schema[`schemaOrg.classes.${type}.is_a`], schema, nameSpace));
-      } else
-        return getSuperClassSlots(schema[`schemaOrg.classes.${type}.is_a`], schema, nameSpace);
-    } else
-      return schema[`schemaOrg.classes.${type}.slots`];
-  }
-  return [];
+  const slots = schema[`schemaOrg.classes.${type}.slots`] || [];
+  const is_a = "is_a" in schema[`schemaOrg.classes.${type}`] ? getSuperClassSlots(schema[`schemaOrg.classes.${type}.is_a`], schema, nameSpace) : [];
+  return [...slots, ...is_a];
 }
 function getSubClassSlots(type, schema, nameSpace) {
   const subClasses = [];
@@ -5015,8 +5092,9 @@ function getSubClassSlots(type, schema, nameSpace) {
       }
     }
     return subClasses;
-  } else
+  } else {
     return [];
+  }
 }
 function getFieldSeverity(requirement, context) {
   const levelToSeverity = {
@@ -5046,6 +5124,9 @@ function getFieldSeverity(requirement, context) {
 
 // src/summary/summary.ts
 var Summary = class {
+  /**
+   * Initializes a new Summary instance with default values
+   */
   constructor() {
     this.dataProcessed = false;
     this.totalFiles = -1;
@@ -5054,6 +5135,13 @@ var Summary = class {
     this.schemaVersion = "";
     this.suggestedColumns = [];
   }
+  /**
+   * Updates summary information with data from a new context
+   * Tracks file counts, sizes, and data types
+   *
+   * @param context - Current validation context to process
+   * @returns Promise that resolves when update is complete
+   */
   async update(context) {
     if (context.file.path.startsWith("/derivatives") && !this.dataProcessed) {
       return;
@@ -5064,6 +5152,12 @@ var Summary = class {
       this.dataTypes.add(context.datatype);
     }
   }
+  /**
+   * Formats the summary data for output
+   * Converts internal state to a standardized output format
+   *
+   * @returns Formatted summary data object
+   */
   formatOutput() {
     return {
       totalFiles: this.totalFiles,
@@ -5095,8 +5189,8 @@ var objectPathHandler = {
 };
 
 // src/setup/loadSchema.ts
-var SCHEMA_BASE_URL = "https://raw.githubusercontent.com/psych-ds/psych-DS/develop/schema_model/versions/jsons";
-var SCHEMA_ORG_URL = "https://raw.githubusercontent.com/psych-ds/psych-DS/develop/schema_model/external_schemas/schemaorg/schemaorg.json";
+var SCHEMA_BASE_URL = "https://raw.githubusercontent.com/psych-ds/psych-DS/master/schema_model/versions/jsons";
+var SCHEMA_ORG_URL = "https://raw.githubusercontent.com/psych-ds/psych-DS/master/schema_model/external_schemas/schemaorg/schemaorg.json";
 var defaultSchema = {};
 var defaultSchemaOrg = {};
 async function loadDefaultSchemas() {
@@ -5105,9 +5199,13 @@ async function loadDefaultSchemas() {
       defaultSchema = await fetchJSON("/defaultSchema.json") || {};
       defaultSchemaOrg = await fetchJSON("/defaultSchemaOrg.json") || {};
     } else {
-      const dirname = getDirname2();
-      defaultSchema = JSON.parse(await readFile2(path.join(dirname, "defaultSchema.json")));
-      defaultSchemaOrg = JSON.parse(await readFile2(path.join(dirname, "defaultSchemaOrg.json")));
+      const dirname = getDirname();
+      defaultSchema = JSON.parse(
+        await readFile(path.join(dirname, "defaultSchema.json"))
+      );
+      defaultSchemaOrg = JSON.parse(
+        await readFile(path.join(dirname, "defaultSchemaOrg.json"))
+      );
     }
   } catch (error2) {
     console.error("Error loading default schemas:", error2);
@@ -5115,7 +5213,7 @@ async function loadDefaultSchemas() {
     defaultSchemaOrg = {};
   }
 }
-function getDirname2() {
+function getDirname() {
   if (isNode && typeof __dirname !== "undefined") {
     return __dirname;
   } else if (isDeno || isNode && typeof __dirname === "undefined") {
@@ -5144,7 +5242,9 @@ async function loadSchema(version = "latest") {
   }
   const versionRegex = /^\d+\.\d+\.\d+$/;
   if (version !== "latest" && !versionRegex.test(version)) {
-    throw new Error(`Invalid version format. Please use 'latest' or 'X.Y.Z' format (e.g., '1.0.0').`);
+    throw new Error(
+      `Invalid version format. Please use 'latest' or 'X.Y.Z' format (e.g., '1.0.0').`
+    );
   }
   const schemaUrl = `${SCHEMA_BASE_URL}/${version}/schema.json`;
   let schemaModule;
@@ -5153,19 +5253,27 @@ async function loadSchema(version = "latest") {
     schemaModule = await fetchJSON(schemaUrl);
     schemaOrgModule = await fetchJSON(`${SCHEMA_ORG_URL}?v=${Date.now()}`);
     if (!schemaModule) {
-      console.warn(`Failed to fetch schema from ${schemaUrl}, using default schema`);
+      console.warn(
+        `Failed to fetch schema from ${schemaUrl}, using default schema`
+      );
       schemaModule = defaultSchema;
     }
     if (!schemaOrgModule) {
       console.warn(`Failed to fetch schemaOrg, using default schemaOrg`);
       schemaOrgModule = defaultSchemaOrg;
     }
-    const combinedSchema = { ...schemaModule, schemaOrg: schemaOrgModule };
+    const combinedSchema = {
+      ...schemaModule,
+      schemaOrg: schemaOrgModule
+    };
     return new Proxy(combinedSchema, objectPathHandler);
   } catch (error2) {
     console.error(`Error loading schema: ${error2}`);
     console.warn("Falling back to default schema");
-    return new Proxy({ ...defaultSchema, schemaOrg: defaultSchemaOrg }, objectPathHandler);
+    return new Proxy(
+      { ...defaultSchema, schemaOrg: defaultSchemaOrg },
+      objectPathHandler
+    );
   }
 }
 
@@ -5203,18 +5311,20 @@ var readElements = memoize(_readElements);
 // src/files/csv.ts
 var normalizeEOL = (str) => str.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 async function parseCSV(contents) {
-  let parse3;
   const columns = new ColumnsMap();
   const issues = [];
   const normalizedStr = normalizeEOL(contents);
   try {
-    let parse4 = isBrowser ? (await Promise.resolve().then(() => (init_sync(), sync_exports))).parse : (await Promise.resolve().then(() => (init_sync2(), sync_exports2))).parse;
-    const rows = parse4(normalizedStr, {
+    const parse3 = isBrowser ? (await Promise.resolve().then(() => (init_sync(), sync_exports))).parse : (await Promise.resolve().then(() => (init_sync2(), sync_exports2))).parse;
+    const rows = parse3(normalizedStr, {
       skip_empty_lines: false,
       relax_column_count: true
-      // Allow rows with inconsistent column counts for better error handling
+      // Allow inconsistent columns for better error handling
     });
     const headers = rows.length ? rows[0] : [];
+    if (new Set(headers).size !== headers.length) {
+      issues.push({ "issue": "CSVHeaderRepeated", "message": null });
+    }
     if (headers.length === 0) {
       issues.push({ "issue": "CSVHeaderMissing", "message": null });
     } else {
@@ -5223,7 +5333,10 @@ async function parseCSV(contents) {
       });
       for (let i = 1; i < rows.length; i++) {
         if (rows[i].length !== headers.length) {
-          issues.push({ "issue": "CSVHeaderLengthMismatch", "message": `Row ${i + 1} has ${rows[i].length} columns, expected ${headers.length}` });
+          issues.push({
+            "issue": "CSVHeaderLengthMismatch",
+            "message": `Row ${i + 1} has ${rows[i].length} columns, expected ${headers.length}`
+          });
         } else {
           for (let j = 0; j < headers.length; j++) {
             const col = columns[headers[j]];
@@ -5239,7 +5352,11 @@ async function parseCSV(contents) {
       }
     }
   } catch (error2) {
-    issues.push({ "issue": "CSVFormattingError", "message": error2.message });
+    issues.push({
+      "issue": "CSVFormattingError",
+      // deno-lint-ignore no-explicit-any
+      "message": error2.message
+    });
   }
   return {
     "columns": columns,
@@ -5249,6 +5366,12 @@ async function parseCSV(contents) {
 
 // src/schema/context.ts
 var psychDSContextDataset = class {
+  /**
+   * Creates a new dataset context
+   * @param options - Validator configuration options
+   * @param metadataFile - Dataset metadata file
+   * @param description - Dataset description object
+   */
   constructor(options, metadataFile, description = {}) {
     this.dataset_description = description;
     this.files = [];
@@ -5264,6 +5387,13 @@ var psychDSContextDataset = class {
 };
 var defaultDsContext = new psychDSContextDataset();
 var psychDSContext = class {
+  /**
+   * Creates a new file context
+   * @param fileTree - File tree containing the file
+   * @param file - File to validate
+   * @param issues - Issue collection for tracking problems
+   * @param dsContext - Optional dataset context
+   */
   constructor(fileTree, file, issues, dsContext) {
     this.fileTree = fileTree;
     this.filenameRules = [];
@@ -5284,20 +5414,18 @@ var psychDSContext = class {
     this.columns = new ColumnsMap();
     this.suggestedColumns = [];
   }
+  /** Gets the file's path */
   get path() {
     return this.file.path;
   }
-  /**
-   * Implementation specific absolute path for the dataset root
-   *
-   * In the browser, this is always at the root
-   */
+  /** Gets the dataset root path */
   get datasetPath() {
     return this.fileTree.path;
   }
   /**
-   * Crawls fileTree from root to current context file, loading any valid
-   * json sidecars found.
+   * Loads and processes sidecar metadata files
+   * Crawls file tree from root to current file, loading JSON sidecars
+   * @param fileTree - Optional specific file tree to process
    */
   async loadSidecar(fileTree) {
     if (!fileTree) {
@@ -5305,10 +5433,7 @@ var psychDSContext = class {
     }
     const validSidecars = fileTree.files.filter((file) => {
       const { suffix, extension } = readElements(file.name);
-      return (
-        // TODO: Possibly better to just specify that files matching any rule from the metadata.yaml file are sidecars
-        extension === ".json" && suffix === "data" && file.name.split(".")[0] === this.fileName || extension === ".json" && file.name.split(".")[0] == "file_metadata"
-      );
+      return extension === ".json" && suffix === "data" && file.name.split(".")[0] === this.fileName || extension === ".json" && file.name.split(".")[0] == "file_metadata";
     });
     if (validSidecars.length > 1) {
       const exactMatch = validSidecars.find(
@@ -5343,8 +5468,10 @@ var psychDSContext = class {
       this.loadValidColumns();
     }
   }
-  // get validColumns from metadata sidecar
-  // used to determined which columns can/must appear within csv headers
+  /**
+   * Extracts valid column names from metadata
+   * Used for CSV header validation
+   */
   loadValidColumns() {
     if (this.extension !== ".csv") {
       return;
@@ -5355,19 +5482,22 @@ var psychDSContext = class {
     }
     let validColumns = [];
     for (const variable of this.expandedSidecar[`${nameSpace}variableMeasured`]) {
-      if ("@value" in variable)
+      if ("@value" in variable) {
         validColumns = [...validColumns, variable["@value"]];
-      else {
+      } else {
         if (`${nameSpace}name` in variable) {
           const subVar = variable[`${nameSpace}name`][0];
-          if ("@value" in subVar)
+          if ("@value" in subVar) {
             validColumns = [...validColumns, subVar["@value"]];
+          }
         }
       }
     }
     this.validColumns = validColumns;
   }
-  // get columns from csv file
+  /**
+   * Loads and validates CSV column data
+   */
   async loadColumns() {
     if (this.extension !== ".csv") {
       return;
@@ -5375,23 +5505,23 @@ var psychDSContext = class {
     let result;
     try {
       result = await parseCSV(await this.file.text());
-    } catch (error2) {
+    } catch (_error) {
       result = /* @__PURE__ */ new Map();
     }
     this.columns = result["columns"];
     this.reportCSVIssues(result["issues"]);
     return;
   }
-  //multiple CSV issues are possible, so these are unpacked from the issue object
+  /**
+   * Records CSV validation issues
+   * @param issues - Array of CSV validation issues
+   */
   reportCSVIssues(issues) {
     issues.forEach((issue) => {
       if (issue.message) {
         this.issues.addSchemaIssue(
           issue.issue,
-          [{
-            ...this.file,
-            evidence: issue.message
-          }]
+          [{ ...this.file, evidence: issue.message }]
         );
       } else {
         this.issues.addSchemaIssue(
@@ -5401,6 +5531,11 @@ var psychDSContext = class {
       }
     });
   }
+  /**
+   * Expands JSON-LD metadata with full context
+   * Handles cross-platform JSON-LD processing
+   * @returns Expanded JSON-LD document
+   */
   async getExpandedSidecar() {
     let jsonld;
     if (!isBrowser) {
@@ -5419,7 +5554,7 @@ var psychDSContext = class {
             document: context,
             documentUrl: url
           };
-        } catch (error2) {
+        } catch (_error) {
           if (isBrowser) {
             try {
               const context = await fetchJSON("/defaultSchemaOrgJsonLD.json") || {};
@@ -5428,12 +5563,13 @@ var psychDSContext = class {
                 document: context,
                 documentUrl: url
               };
-            } catch (error3) {
-              console.log("myerror", error3);
+            } catch (error2) {
+              console.log(error2);
             }
           } else {
-            const dirname = getDirname();
-            const context = JSON.parse(await readFile("../setup/defaultSchemaOrgJsonLD.json"));
+            const context = JSON.parse(
+              await readFile("../setup/defaultSchemaOrgJsonLD.json")
+            );
             return {
               contextUrl: null,
               document: context,
@@ -5458,22 +5594,29 @@ var psychDSContext = class {
         }
         return {};
       }
-      const expandOptions = {
+      if ("@context" in this.sidecar) {
+        if (Array.isArray(this.sidecar["@context"]) && this.sidecar["@context"].length === 1) {
+          this.sidecar["@context"] = this.sidecar["@context"][0];
+        }
+        if (typeof this.sidecar["@context"] == "string" && ["http://schema.org/", "http://schema.org", "http://www.schema.org/", "http://www.schema.org", "https://schema.org/", "https://schema.org", "https://www.schema.org/", "https://www.schema.org/"].includes(this.sidecar["@context"])) {
+          this.sidecar["@context"] = {
+            "@vocab": "http://schema.org/"
+          };
+        }
+      }
+      const exp = await jsonldToUse.expand(this.sidecar, {
         documentLoader: customDocumentLoader
-      };
-      if ("@context" in this.sidecar && typeof this.sidecar["@context"] == "string" && ["http://schema.org/", "http://schema.org", "http://www.schema.org/", "http://www.schema.org", "https://schema.org/", "https://schema.org", "https://www.schema.org/", "https://www.schema.org/"].includes(this.sidecar["@context"]))
-        this.sidecar["@context"] = {
-          "@vocab": "http://schema.org/"
-        };
-      const exp = await jsonldToUse.expand(this.sidecar, expandOptions);
+      });
       return exp[0] || {};
     } catch (error2) {
       const issueFile2 = {
         ...this.file,
+        // deno-lint-ignore no-explicit-any
         evidence: JSON.stringify(error2.details.context)
       };
       this.issues.add({
         key: "INVALID_JSONLD_FORMATTING",
+        // deno-lint-ignore no-explicit-any
         reason: `${error2.message.split(";")[1]}`,
         severity: "error",
         files: [issueFile2]
@@ -5481,6 +5624,10 @@ var psychDSContext = class {
       return {};
     }
   }
+  /**
+   * Performs all asynchronous loading operations
+   * Loads sidecar metadata and CSV columns in parallel
+   */
   async asyncLoads() {
     await Promise.allSettled([
       this.loadSidecar(),
@@ -5534,17 +5681,34 @@ async function validate(fileTree, options) {
         "InvalidJsonFormatting",
         [ddFile]
       );
-      options.emitter?.emit("metadata-json", { success: false, issue: issues.get("INVALID_JSON_FORMATTING") });
-      if (options.emitter)
-        return null;
+      options.emitter?.emit("metadata-json", {
+        success: false,
+        issue: issues.get("INVALID_JSON_FORMATTING")
+      });
+      if (options.emitter) {
+        return {
+          valid: false,
+          issues,
+          summary: summary.formatOutput()
+        };
+      }
     }
   } else {
     issues.addSchemaIssue(
-      "MissingDatasetDescription"
+      "MissingDatasetDescription",
+      []
     );
-    options.emitter?.emit("find-metadata", { success: false, issue: issues.get("MISSING_DATASET_DESCRIPTION") });
-    if (options.emitter)
-      return null;
+    options.emitter?.emit("find-metadata", {
+      success: false,
+      issue: issues.get("MISSING_DATASET_DESCRIPTION")
+    });
+    if (options.emitter) {
+      return {
+        valid: false,
+        issues,
+        summary: summary.formatOutput()
+      };
+    }
     dsContext = new psychDSContextDataset(options);
   }
   const rulesRecord = {};
@@ -5571,12 +5735,16 @@ async function validate(fileTree, options) {
         );
       });
     }
-    if (context.file.ignored) {
+    if (context.file.ignored)
       continue;
-    }
     await context.asyncLoads();
     if (context.extension === ".csv") {
-      summary.suggestedColumns = [.../* @__PURE__ */ new Set([...summary.suggestedColumns, ...Object.keys(context.columns)])];
+      summary.suggestedColumns = [
+        .../* @__PURE__ */ new Set([
+          ...summary.suggestedColumns,
+          ...Object.keys(context.columns)
+        ])
+      ];
     }
     for (const check of CHECKS3) {
       await check(schema, context);
@@ -5586,18 +5754,42 @@ async function validate(fileTree, options) {
     }
     await summary.update(context);
     if (context.extension === ".csv" && context.suffix === "data") {
+      options.emitter?.emit("check-for-csv", { success: true });
       options.emitter?.emit("metadata-utf8", { success: true });
       emitCheck("metadata-json", ["INVALID_JSON_FORMATTING"]);
       emitCheck("metadata-fields", ["JSON_KEY_REQUIRED"]);
       emitCheck("metadata-jsonld", ["INVALID_JSONLD_FORMATTING"]);
-      emitCheck("metadata-type", ["INCORRECT_DATASET_TYPE", "MISSING_DATASET_TYPE"]);
-      emitCheck("metadata-schemaorg", ["INVALID_SCHEMAORG_PROPERTY", "INVALID_OBJECT_TYPE", "OBJECT_TYPE_MISSING"]);
-      options.emitter?.emit("check-for-csv", { success: true });
+      emitCheck("metadata-type", [
+        "INCORRECT_DATASET_TYPE",
+        "MISSING_DATASET_TYPE"
+      ]);
+      emitCheck("metadata-schemaorg", [
+        "INVALID_SCHEMAORG_PROPERTY",
+        "INVALID_OBJECT_TYPE",
+        "OBJECT_TYPE_MISSING"
+      ]);
     }
   }
-  emitCheck("csv-keywords", ["FILENAME_KEYWORD_FORMATTING_ERROR", "FILENAME_UNOFFICIAL_KEYWORD_ERROR"]);
+  options.emitter?.emit("metadata-utf8", { success: true });
+  emitCheck("metadata-json", ["INVALID_JSON_FORMATTING"]);
+  emitCheck("metadata-fields", ["JSON_KEY_REQUIRED"]);
+  emitCheck("metadata-jsonld", ["INVALID_JSONLD_FORMATTING"]);
+  emitCheck("metadata-type", [
+    "INCORRECT_DATASET_TYPE",
+    "MISSING_DATASET_TYPE"
+  ]);
+  emitCheck("metadata-schemaorg", [
+    "INVALID_SCHEMAORG_PROPERTY",
+    "INVALID_OBJECT_TYPE",
+    "OBJECT_TYPE_MISSING"
+  ]);
+  emitCheck("csv-keywords", [
+    "FILENAME_KEYWORD_FORMATTING_ERROR",
+    "FILENAME_UNOFFICIAL_KEYWORD_ERROR"
+  ]);
   emitCheck("csv-parse", ["CSV_FORMATTING_ERROR"]);
   emitCheck("csv-header", ["CSV_HEADER_MISSING"]);
+  emitCheck("csv-header-repeat", ["CSV_HEADER_REPEATED"]);
   emitCheck("csv-nomismatch", ["CSV_HEADER_LENGTH_MISMATCH"]);
   emitCheck("csv-rowid", ["ROWID_VALUES_NOT_UNIQUE"]);
   emitCheck("check-variableMeasured", ["CSV_COLUMN_MISSING_FROM_METADATA"]);
@@ -5605,13 +5797,13 @@ async function validate(fileTree, options) {
   checkMissingRules(schema, rulesRecord, issues);
   emitCheck("find-metadata", ["MISSING_DATASET_DESCRIPTION"]);
   emitCheck("find-data-dir", ["MISSING_DATA_DIRECTORY"]);
+  emitCheck("check-for-csv", ["MISSING_DATAFILE"]);
   issues.filterIssues(rulesRecord);
-  const output = {
+  return {
     valid: [...issues.values()].filter((issue) => issue.severity === "error").length === 0,
     issues,
     summary: summary.formatOutput()
   };
-  return output;
 }
 
 // src/types/filetree.ts
@@ -5677,11 +5869,7 @@ var REGEX_REGEXP_RANGE = /([0-z])-([0-z])/g;
 var RETURN_FALSE = () => false;
 var sanitizeRange = (range) => range.replace(
   REGEX_REGEXP_RANGE,
-  (match, from2, to) => from2.charCodeAt(0) <= to.charCodeAt(0) ? match : (
-    // Invalid range (out of order) which is ok for gitignore rules but
-    //   fatal for JavaScript regular expression, so eliminate it.
-    EMPTY
-  )
+  (match, from2, to) => from2.charCodeAt(0) <= to.charCodeAt(0) ? match : EMPTY
 );
 var cleanRangeBackSlash = (slashes) => {
   const { length } = slashes;
@@ -5748,24 +5936,7 @@ var REPLACERS = [
     // If starts with '**', adding a '^' to the regular expression also works
     /^(?=[^^])/,
     function startingReplacer() {
-      return !/\/(?!$)/.test(this) ? (
-        // > Prior to 2.22.1
-        // > If the pattern does not contain a slash /,
-        // >   Git treats it as a shell glob pattern
-        // Actually, if there is only a trailing slash,
-        //   git also treats it as a shell glob pattern
-        // After 2.22.1 (compatible but clearer)
-        // > If there is a separator at the beginning or middle (or both)
-        // > of the pattern, then the pattern is relative to the directory
-        // > level of the particular .gitignore file itself.
-        // > Otherwise the pattern may also match at any level below
-        // > the .gitignore level.
-        "(?:^|\\/)"
-      ) : (
-        // > Otherwise, Git treats the pattern as a shell glob suitable for
-        // >   consumption by fnmatch(3)
-        "^"
-      );
+      return !/\/(?!$)/.test(this) ? "(?:^|\\/)" : "^";
     }
   ],
   // two globstars
@@ -5775,19 +5946,7 @@ var REPLACERS = [
     // Zero, one or several directories
     // should not use '*', or it will be replaced by the next replacer
     // Check if it is not the last `'/**'`
-    (_, index, str) => index + 6 < str.length ? (
-      // case: /**/
-      // > A slash followed by two consecutive asterisks then a slash matches
-      // >   zero or more directories.
-      // > For example, "a/**/b" matches "a/b", "a/x/b", "a/x/y/b" and so on.
-      // '/**/'
-      "(?:\\/[^\\/]+)*"
-    ) : (
-      // case: /**
-      // > A trailing `"/**"` matches everything inside.
-      // #21: everything inside but it should not include the current folder
-      "\\/.+"
-    )
+    (_, index, str) => index + 6 < str.length ? "(?:\\/[^\\/]+)*" : "\\/.+"
   ],
   // normal intermediate wildcards
   [
@@ -5821,19 +5980,7 @@ var REPLACERS = [
     // > can be used to match one of the characters in a range.
     // `\` is escaped by step 3
     /(\\)?\[([^\]/]*?)(\\*)($|\])/g,
-    (match, leadEscape, range, endEscape, close) => leadEscape === ESCAPE ? (
-      // '\\[bar]' -> '\\\\[bar\\]'
-      `\\[${range}${cleanRangeBackSlash(endEscape)}${close}`
-    ) : close === "]" ? endEscape.length % 2 === 0 ? (
-      // A normal case, and it is a range notation
-      // '[bar]'
-      // '[bar\\\\]'
-      `[${sanitizeRange(range)}${endEscape}]`
-    ) : (
-      // Invalid range notaton
-      // '[bar\\]' -> '[bar\\\\]'
-      "[]"
-    ) : "[]"
+    (match, leadEscape, range, endEscape, close) => leadEscape === ESCAPE ? `\\[${range}${cleanRangeBackSlash(endEscape)}${close}` : close === "]" ? endEscape.length % 2 === 0 ? `[${sanitizeRange(range)}${endEscape}]` : "[]" : "[]"
   ],
   // ending
   [
@@ -5850,30 +5997,13 @@ var REPLACERS = [
     // 'js*' will not match 'a.js'
     // 'js/' will not match 'a.js'
     // 'js' will match 'a.js' and 'a.js/'
-    (match) => /\/$/.test(match) ? (
-      // foo/ will not match 'foo'
-      `${match}$`
-    ) : (
-      // foo matches 'foo' and 'foo/'
-      `${match}(?=$|\\/$)`
-    )
+    (match) => /\/$/.test(match) ? `${match}$` : `${match}(?=$|\\/$)`
   ],
   // trailing wildcard
   [
     /(\^|\\\/)?\\\*$/,
     (_, p1) => {
-      const prefix = p1 ? (
-        // '\^':
-        // '/*' does not match EMPTY
-        // '/*' does not match everything
-        // '\\\/':
-        // 'abc/*' does not match 'abc/'
-        `${p1}[^/]+`
-      ) : (
-        // 'a*' matches 'a'
-        // 'a*' matches 'aa'
-        "[^/]*"
-      );
+      const prefix = p1 ? `${p1}[^/]+` : "[^/]*";
       return `${prefix}(?=$|\\/$)`;
     }
   ]
@@ -6042,11 +6172,7 @@ var Ignore = class {
       checkUnignored,
       slices
     );
-    return cache[path2] = parent.ignored ? (
-      // > It is not possible to re-include a file if a parent directory of
-      // >   that file is excluded.
-      parent
-    ) : this._testOne(path2, checkUnignored);
+    return cache[path2] = parent.ignored ? parent : this._testOne(path2, checkUnignored);
   }
   ignores(path2) {
     return this._test(path2, this._ignoreCache, false).ignored;
@@ -6093,16 +6219,35 @@ var defaultIgnores = [
 ];
 var _ignore;
 var FileIgnoreRules = class {
+  /**
+   * Creates new ignore rules manager
+   * Initializes with default patterns and custom configuration
+   *
+   * @param config - Additional ignore patterns to apply
+   */
   constructor(config) {
+    /** Internal ignore rules implementation */
     __privateAdd(this, _ignore, void 0);
     __privateSet(this, _ignore, ignore({ allowRelativePaths: true }));
     __privateGet(this, _ignore).add(defaultIgnores);
     __privateGet(this, _ignore).add(config);
   }
+  /**
+   * Adds additional ignore patterns
+   * Expands current rule set with new patterns
+   *
+   * @param config - New patterns to add
+   */
   add(config) {
     __privateGet(this, _ignore).add(config);
   }
-  /** Test if a dataset relative path should be ignored given configured rules */
+  /**
+   * Tests if a path should be ignored
+   * Checks path against all configured ignore patterns
+   *
+   * @param path - Path to test (relative to dataset root)
+   * @returns True if path matches any ignore pattern
+   */
   test(path2) {
     return __privateGet(this, _ignore).ignores(path2);
   }
@@ -6118,13 +6263,24 @@ var UnicodeDecodeError = class extends Error {
 };
 var _ignore2, _fileInfo, _datasetAbsPath, _openHandle, openHandle_fn;
 var psychDSFileDeno = class {
+  /**
+   * Creates a new Deno file instance
+   * @param datasetPath - Path to dataset root
+   * @param filePath - Relative path to file
+   * @param ignore - Ignore rules to apply
+   */
   constructor(datasetPath, filePath, ignore2) {
     /**
-     * Return a Deno file handle
+     * Opens a Deno file handle with read-only access
+     * @returns Deno file handle
+     * @private
      */
     __privateAdd(this, _openHandle);
+    /** File ignore rules */
     __privateAdd(this, _ignore2, void 0);
+    /** Cached file information */
     __privateAdd(this, _fileInfo, void 0);
+    /** Absolute path to dataset root */
     __privateAdd(this, _datasetAbsPath, void 0);
     __privateSet(this, _datasetAbsPath, datasetPath);
     this.path = filePath;
@@ -6141,25 +6297,36 @@ var psychDSFileDeno = class {
       }
     }
   }
+  /**
+   * Gets absolute path to file
+   * @returns Absolute file system path
+   * @private
+   */
   _getPath() {
     return path.join(__privateGet(this, _datasetAbsPath), this.path);
   }
+  /** Gets file size in bytes */
   get size() {
     return __privateGet(this, _fileInfo) ? __privateGet(this, _fileInfo).size : -1;
   }
+  /** Gets readable stream of file content */
   get stream() {
     return createReadStream(this._getPath());
   }
+  /** Checks if file should be ignored */
   get ignored() {
     return __privateGet(this, _ignore2).test(this.path);
   }
   /**
-   * Read the entire file and decode as utf-8 text
+   * Reads entire file as UTF-8 text
+   * Checks for and handles UTF-16 encoding detection
+   * @returns Promise resolving to file content
+   * @throws {UnicodeDecodeError} If file appears to be UTF-16 encoded
    */
   async text() {
     let data;
     if (!isBrowser) {
-      data = await readFile2(this._getPath());
+      data = await readFile(this._getPath());
     } else if (this.webFile) {
       data = await this.webFile.text();
     } else {
@@ -6171,12 +6338,17 @@ var psychDSFileDeno = class {
     return data;
   }
   /**
-   * Read bytes in a range efficiently from a given file
+   * Reads bytes from file in specified range
+   * Efficiently handles large files through streaming
+   *
+   * @param size - Number of bytes to read
+   * @param _offset - Start position (currently unused)
+   * @returns Promise resolving to byte array
    */
-  async readBytes(size, offset = 0) {
+  async readBytes(size, _offset = 0) {
     const stream = this.stream;
     const reader = stream.getReader();
-    let result = new Uint8Array(size);
+    const result = new Uint8Array(size);
     let bytesRead = 0;
     while (bytesRead < size) {
       const { value, done } = await reader.read();
@@ -6211,7 +6383,7 @@ async function _readFileTree(rootPathOrDict, relativePath, ignore2, parent, cont
           path.join(relativePath, dirEntry.name),
           ignore2
         );
-        if (dirEntry.name === ".psychdsignore") {
+        if (dirEntry.name === ".psychds-ignore") {
           ignore2.add(await readPsychDSIgnore(file));
         }
         tree.files.push(file);
@@ -6233,12 +6405,18 @@ async function _readFileTree(rootPathOrDict, relativePath, ignore2, parent, cont
       if (rootPathOrDict[key]["type"] === "file") {
         const file = new psychDSFileDeno(".", path2, ignore2);
         file.webFile = rootPathOrDict[key]["file"];
-        if (key === ".psychdsignore") {
+        if (key === ".psychds-ignore") {
           ignore2.add(await readPsychDSIgnore(file));
         }
         tree.files.push(file);
       } else {
-        const dirTree = await _readFileTree(rootPathOrDict[key]["contents"], path2, ignore2, tree, context);
+        const dirTree = await _readFileTree(
+          rootPathOrDict[key]["contents"],
+          path2,
+          ignore2,
+          tree,
+          context
+        );
         tree.directories.push(dirTree);
       }
     }
@@ -6263,7 +6441,7 @@ var loggerPromise = (async () => {
   } else {
     const winston = await import("winston");
     const { createLogger, format, transports } = winston;
-    return createLogger({
+    const winstonLogger = createLogger({
       level: "info",
       levels: {
         error: 0,
@@ -6274,11 +6452,16 @@ var loggerPromise = (async () => {
       },
       format: format.combine(
         format.timestamp(),
-        format.printf(({ timestamp, level, message, ...rest }) => {
-          if (level === "checklist") {
-            return message;
+        // deno-lint-ignore no-explicit-any
+        format.printf((info2) => {
+          if (info2.level === "checklist") {
+            return info2.message;
           }
-          return `${timestamp} [${level.toUpperCase()}]: ${message} ${Object.keys(rest).length ? JSON.stringify(rest) : ""}`;
+          return `${info2.timestamp} [${info2.level.toUpperCase()}]: ${info2.message} ${Object.keys(info2).length > 3 ? JSON.stringify(Object.assign({}, info2, {
+            timestamp: void 0,
+            level: void 0,
+            message: void 0
+          })) : ""}`;
         })
       ),
       transports: [
@@ -6287,11 +6470,22 @@ var loggerPromise = (async () => {
         })
       ]
     });
+    const logger = {
+      error: (message, ...meta) => winstonLogger.error(message, ...meta),
+      warn: (message, ...meta) => winstonLogger.warn(message, ...meta),
+      info: (message, ...meta) => winstonLogger.info(message, ...meta),
+      debug: (message, ...meta) => winstonLogger.debug(message, ...meta),
+      checklist: (message) => winstonLogger.log("checklist", message),
+      add: (transport) => winstonLogger.add(transport)
+    };
+    return logger;
   }
 })();
 var createAsyncLogger = (level) => async (message, ...meta) => {
   const logger = await loggerPromise;
-  logger[level](message, ...meta);
+  if (logger[level]) {
+    logger[level](message, ...meta);
+  }
 };
 var error = createAsyncLogger("error");
 var warn = createAsyncLogger("warn");
@@ -6301,7 +6495,7 @@ var checklist = createAsyncLogger("checklist");
 
 // src/utils/output.ts
 var chalkInstance = null;
-var TableClass = null;
+var tableClass = null;
 async function importChalk() {
   if (isBrowser)
     return null;
@@ -6328,7 +6522,7 @@ function getChalk() {
     chalkPromise = importChalk();
   }
   return new Proxy({}, {
-    get: (target, prop) => {
+    get: (_target, prop) => {
       return (text) => {
         if (chalkInstance) {
           return chalkInstance[prop](text);
@@ -6340,7 +6534,9 @@ function getChalk() {
 }
 function browserFormatIssue(issue, options) {
   const output = [];
-  output.push(`[${issue.severity.toUpperCase()}] ${issue.reason} (${issue.key})`);
+  output.push(
+    `[${issue.severity.toUpperCase()}] ${issue.reason} (${issue.key})`
+  );
   output.push("");
   let fileOutCount = 0;
   issue.files.forEach((file) => {
@@ -6408,71 +6604,168 @@ function nodeFormatIssue(issue, options, chalk) {
 (async () => {
   if (!isBrowser) {
     chalkInstance = await importChalk();
-    TableClass = await importTable();
+    tableClass = await importTable();
   }
 })();
 
 // src/utils/validationProgressTracker.ts
 var ValidationProgressTracker = class {
   /**
-   * Creates a new ValidationProgressTracker.
-   * @param emitter - The EventEmitter to listen for validation events.
+   * Creates a new validation progress tracker
+   * @param emitter - EventEmitter instance for tracking validation events
    */
   constructor(emitter) {
     this.emitter = emitter;
     this.steps = [
       {
         key: "start",
-        message: { imperative: "Start validation", pastTense: "Validation started" },
+        message: {
+          imperative: "Start validation",
+          pastTense: "Validation started"
+        },
         subSteps: []
       },
       {
         key: "check-folder",
-        message: { imperative: "Find project folder", pastTense: "Project folder found" },
+        message: {
+          imperative: "Find project folder",
+          pastTense: "Project folder found"
+        },
         subSteps: [
-          { key: "build-tree", message: { imperative: "Crawl project folder and construct file tree", pastTense: "Project folder crawled and file tree constructed" } }
+          {
+            key: "build-tree",
+            message: {
+              imperative: "Crawl project folder and construct file tree",
+              pastTense: "Project folder crawled and file tree constructed"
+            }
+          }
         ]
       },
       {
         key: "find-metadata",
-        message: { imperative: "Find metadata file", pastTense: 'Metadata file "dataset_description.json" found in the root folder' },
+        message: {
+          imperative: "Find metadata file",
+          pastTense: 'Metadata file "dataset_description.json" found in the root folder'
+        },
         subSteps: []
       },
       {
         key: "find-data-dir",
-        message: { imperative: `Find "data" subfolder`, pastTense: `"data" subfolder found in the root folder` },
+        message: {
+          imperative: `Find "data" subfolder`,
+          pastTense: `"data" subfolder found in the root folder`
+        },
         subSteps: []
       },
       {
         key: "parse-metadata",
-        message: { imperative: 'Parse "dataset_description.json" metadata file', pastTense: 'Successfully parsed "dataset_description.json" metadata file' },
+        message: {
+          imperative: 'Parse "dataset_description.json" metadata file',
+          pastTense: 'Successfully parsed "dataset_description.json" metadata file'
+        },
         subSteps: [
-          { key: "metadata-utf8", message: { imperative: "Check metadata file for utf-8 encoding", pastTense: "Metadata file is utf-8 encoded" } },
-          { key: "metadata-json", message: { imperative: "Parse metadata file as JSON", pastTense: "Metadata file parsed successfully" } },
-          { key: "metadata-jsonld", message: { imperative: "Validate metadata file as JSON-LD", pastTense: "Metadata file is valid JSON-LD" } },
-          { key: "metadata-fields", message: { imperative: `Check metadata file for required "name", "description", and "variableMeasured" fields`, pastTense: `Metadata file contains required "name", "description", and "variableMeasured" fields.` } },
-          { key: "metadata-type", message: { imperative: 'Check metadata file for field "@type" with value "Dataset"', pastTense: 'Metadata file has "@type" field with value "Dataset"' } }
+          {
+            key: "metadata-utf8",
+            message: {
+              imperative: "Check metadata file for utf-8 encoding",
+              pastTense: "Metadata file is utf-8 encoded"
+            }
+          },
+          {
+            key: "metadata-json",
+            message: {
+              imperative: "Parse metadata file as JSON",
+              pastTense: "Metadata file parsed successfully"
+            }
+          },
+          {
+            key: "metadata-jsonld",
+            message: {
+              imperative: "Validate metadata file as JSON-LD",
+              pastTense: "Metadata file is valid JSON-LD"
+            }
+          },
+          {
+            key: "metadata-fields",
+            message: {
+              imperative: `Check metadata file for required "name", "description", and "variableMeasured" fields`,
+              pastTense: `Metadata file contains required "name", "description", and "variableMeasured" fields.`
+            }
+          },
+          {
+            key: "metadata-type",
+            message: {
+              imperative: 'Check metadata file for field "@type" with value "Dataset"',
+              pastTense: 'Metadata file has "@type" field with value "Dataset"'
+            }
+          }
         ]
       },
       {
         key: "check-for-csv",
-        message: { imperative: `Check for CSV data files in "data" subfolder`, pastTense: `CSV data files found in "data" subfolder` },
+        message: {
+          imperative: `Check for CSV data files in "data" subfolder`,
+          pastTense: `CSV data files found in "data" subfolder`
+        },
         subSteps: []
       },
       {
         key: "validate-csvs",
-        message: { imperative: `Check that all CSV data files are valid`, pastTense: `All CSV data files are valid` },
+        message: {
+          imperative: `Check that all CSV data files are valid`,
+          pastTense: `All CSV data files are valid`
+        },
         subSteps: [
-          { key: "csv-keywords", message: { imperative: `Check filename for keyword formatting `, pastTense: `Filename uses valid keyword formatting` } },
-          { key: "csv-parse", message: { imperative: `Parse data file as CSV`, pastTense: `Data file successfully parsed as CSV` } },
-          { key: "csv-header", message: { imperative: `Check for header line`, pastTense: `Header line found` } },
-          { key: "csv-nomismatch", message: { imperative: `Check all lines for equal number of cells`, pastTense: `All lines have equal number of cells` } },
-          { key: "csv-rowid", message: { imperative: `Check for any row_id columns with non-unique values`, pastTense: `All row_id columns have unique values` } }
+          {
+            key: "csv-keywords",
+            message: {
+              imperative: `Check filename for keyword formatting `,
+              pastTense: `Filename uses valid keyword formatting`
+            }
+          },
+          {
+            key: "csv-parse",
+            message: {
+              imperative: `Parse data file as CSV`,
+              pastTense: `Data file successfully parsed as CSV`
+            }
+          },
+          {
+            key: "csv-header",
+            message: {
+              imperative: `Check for header line`,
+              pastTense: `Header line found`
+            }
+          },
+          {
+            key: "csv-header-repeat",
+            message: {
+              imperative: `Check for redundant column names`,
+              pastTense: `No redundant column names found`
+            }
+          },
+          {
+            key: "csv-nomismatch",
+            message: {
+              imperative: `Check all lines for equal number of cells`,
+              pastTense: `All lines have equal number of cells`
+            }
+          },
+          {
+            key: "csv-rowid",
+            message: {
+              imperative: `Check for any row_id columns with non-unique values`,
+              pastTense: `All row_id columns have unique values`
+            }
+          }
         ]
       },
       {
         key: "check-variableMeasured",
-        message: { imperative: `Confirm that all column headers in CSV data files are found in "variableMeasured" metadata field`, pastTense: `All column headers in CSV data files were found in "variableMeasured" metadata field` },
+        message: {
+          imperative: `Confirm that all column headers in CSV data files are found in "variableMeasured" metadata field`,
+          pastTense: `All column headers in CSV data files were found in "variableMeasured" metadata field`
+        },
         subSteps: []
       }
     ];
@@ -6480,14 +6773,21 @@ var ValidationProgressTracker = class {
     this.initializeStepStatus();
     this.result = null;
     this.lastUpdateTime = 0;
+    this.logger = null;
     this.setupListeners();
-    loggerPromise.then((resolvedLogger) => {
-      this.logger = resolvedLogger;
-      this.displayChecklist();
-    });
+    this.initLogger();
   }
   /**
-   * Initializes the status for all steps and substeps.
+   * Initializes the logger instance and displays initial checklist
+   * @private
+   */
+  async initLogger() {
+    this.logger = await loggerPromise;
+    this.displayChecklist();
+  }
+  /**
+   * Sets the initial status for all steps and sub-steps to incomplete
+   * @private
    */
   initializeStepStatus() {
     this.steps.forEach((superStep) => {
@@ -6498,32 +6798,44 @@ var ValidationProgressTracker = class {
     });
   }
   /**
-   * Sets up listeners for all steps and substeps.
+   * Sets up event listeners for all steps and sub-steps
+   * Configures handlers to update status when steps complete
+   * @private
    */
   setupListeners() {
     this.steps.forEach((superStep) => {
       if (superStep.subSteps.length === 0) {
-        this.emitter.once(superStep.key, (data) => {
-          this.updateStepStatus(superStep.key, data, superStep);
-        });
+        this.emitter.once(
+          superStep.key,
+          (data) => {
+            this.updateStepStatus(superStep.key, data, superStep);
+          }
+        );
       } else {
         superStep.subSteps.forEach((subStep) => {
-          this.emitter.once(subStep.key, (data) => {
-            this.updateStepStatus(subStep.key, data, superStep);
-          });
+          this.emitter.once(
+            subStep.key,
+            (data) => {
+              this.updateStepStatus(subStep.key, data, superStep);
+            }
+          );
         });
       }
     });
   }
   /**
-   * Updates the status of a step or substep.
-   * @param stepKey - The key of the step to update.
-   * @param superStepIndex - The index of the parent step.
-   * @param data - The status data for the step.
-   * @param superStep - The parent step (if updating a substep).
+   * Updates the status of a step or sub-step
+   * @param stepKey - Identifier of the step to update
+   * @param data - New status data for the step
+   * @param superStep - Parent step if updating a sub-step
+   * @private
    */
   updateStepStatus(stepKey, data, superStep) {
-    this.stepStatus.set(stepKey, { complete: true, success: data.success, issue: data.issue });
+    this.stepStatus.set(stepKey, {
+      complete: true,
+      success: data.success,
+      issue: data.issue
+    });
     if (superStep && superStep.subSteps.length > 0) {
       this.updateSuperStepStatus(superStep);
     }
@@ -6531,12 +6843,18 @@ var ValidationProgressTracker = class {
     this.lastUpdateTime = Date.now();
   }
   /**
-   * Updates the status of a parent step based on its substeps.
-   * @param superStep - The parent step to update.
+   * Updates a parent step's status based on its sub-steps
+   * Parent step is complete only when all sub-steps are complete
+   * @param superStep - Parent step to update
+   * @private
    */
   updateSuperStepStatus(superStep) {
-    const allSubStepsComplete = superStep.subSteps.every((subStep) => this.stepStatus.get(subStep.key)?.complete);
-    const allSubStepsSuccess = superStep.subSteps.every((subStep) => this.stepStatus.get(subStep.key)?.success);
+    const allSubStepsComplete = superStep.subSteps.every(
+      (subStep) => this.stepStatus.get(subStep.key)?.complete
+    );
+    const allSubStepsSuccess = superStep.subSteps.every(
+      (subStep) => this.stepStatus.get(subStep.key)?.success
+    );
     this.stepStatus.set(superStep.key, {
       complete: allSubStepsComplete,
       success: allSubStepsSuccess,
@@ -6544,7 +6862,10 @@ var ValidationProgressTracker = class {
     });
   }
   /**
-   * Displays the current status of all steps and substeps.
+   * Displays the current validation progress as a checklist
+   * Shows status of all steps, including success/failure indicators
+   * and any validation issues encountered
+   * @private
    */
   displayChecklist() {
     if (!this.logger) {
@@ -6566,13 +6887,20 @@ var ValidationProgressTracker = class {
       const superStepCheckMark = superStepStatus?.complete && prevComplete && !prevFails ? superStepStatus.success ? "\u2713" : "\u2717" : " ";
       if (superStepStatus?.complete && prevComplete && !prevFails) {
         this.emitter.emit("progress", { step: superStep });
-        this.emitter.emit("stepStatusChange", { stepStatus: Array.from(this.stepStatus.entries()), superStep });
+        this.emitter.emit("stepStatusChange", {
+          stepStatus: Array.from(this.stepStatus.entries()),
+          superStep
+        });
       }
-      checklistLines.push(`[${superStepCheckMark}] ${index + 1}. ${superStepMessage}`);
+      checklistLines.push(
+        `[${superStepCheckMark}] ${index + 1}. ${superStepMessage}`
+      );
       if (superStepStatus?.complete && prevComplete && !prevFails && !superStepStatus.success && superStepStatus.issue) {
         validationFailed = true;
-        checklistLines.push(`   Issue:
- ${formatIssue(superStepStatus.issue)}`);
+        checklistLines.push(
+          `   Issue:
+ ${formatIssue(superStepStatus.issue)}`
+        );
       }
       if (!superStepStatus?.success && superStep.subSteps.length == 0) {
         prevFails = true;
@@ -6582,14 +6910,22 @@ var ValidationProgressTracker = class {
         const subStepStatus = this.stepStatus.get(subStep.key);
         const subStepMessage = subStepStatus?.complete && subComplete && !prevFails ? subStep.message.pastTense : subStep.message.imperative;
         const subStepCheckMark = subStepStatus?.complete && subComplete && !prevFails ? subStepStatus.success ? "\u2713" : "\u2717" : " ";
-        checklistLines.push(`  [${subStepCheckMark}] ${index + 1}.${subIndex + 1}. ${subStepMessage}`);
+        checklistLines.push(
+          `  [${subStepCheckMark}] ${index + 1}.${subIndex + 1}. ${subStepMessage}`
+        );
         if (subStepStatus?.complete && subComplete && !prevFails && !subStepStatus.success && subStepStatus.issue) {
           validationFailed = true;
-          checklistLines.push(`     Issue:
- ${formatIssue(subStepStatus.issue)}`);
+          checklistLines.push(
+            `     Issue:
+ ${formatIssue(subStepStatus.issue)}`
+          );
         }
-        if (subStepStatus?.complete && subComplete && !prevFails)
-          this.emitter.emit("stepStatusChange", { stepStatus: Array.from(this.stepStatus.entries()), superStep });
+        if (subStepStatus?.complete && subComplete && !prevFails) {
+          this.emitter.emit("stepStatusChange", {
+            stepStatus: Array.from(this.stepStatus.entries()),
+            superStep
+          });
+        }
         if (!subStepStatus?.complete) {
           subComplete = false;
         }
@@ -6608,10 +6944,10 @@ var ValidationProgressTracker = class {
     }
   }
   /**
-   * Waits for the validation process to complete.
-   * @returns A promise that resolves with the validation result.
+   * Waits for the validation process to complete
+   * @returns Promise that resolves when validation finishes or halts
    */
-  async waitForCompletion() {
+  waitForCompletion() {
     if (this.result) {
       return Promise.resolve();
     }
@@ -6628,10 +6964,8 @@ var ValidationProgressTracker = class {
 
 // src/validate-web.ts
 async function validateWeb(fileTree, options) {
-  const isPathString = typeof fileTreeOrPath === "string";
-  const args = isPathString ? [fileTreeOrPath] : [];
-  fileTree = await readFileTree(fileTree);
-  return validate(fileTree, options);
+  const builtFileTree = await readFileTree(fileTree);
+  return validate(builtFileTree, options);
 }
 export {
   ValidationProgressTracker,
