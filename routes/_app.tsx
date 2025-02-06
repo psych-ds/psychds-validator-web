@@ -8,7 +8,7 @@ export default function App({ Component }: PageProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <script src="/jsonld.min.js"></script>
         <script src="/psychds-validator.js" type="module"></script>
-        <script data-goatcounter="https://psychdsvalidator.goatcounter.com/count"
+        <script data-goatcounter="https://psychdsvalidator.goatcounter.com/count" data-goatcounter-settings='{"allow_frame": true}'
         async src="//gc.zgo.at/count.js"></script>
         <script type="module">
           import * as psychDSValidator from '/psychds-validator.js';
