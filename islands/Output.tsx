@@ -83,8 +83,12 @@ const StepItem = ({ step, status, stepStatus }: { step: SuperStep, status: StepS
       {status.issue && (
         <div class="mt-2 text-red-600">
           <p><b>Issue:</b> {status.issue.reason}</p>
-          {status.issue.evidence && (
-            <p class="mt-1"><b>Evidence:</b> {status.issue.evidence}</p>
+          {status.issue.files && (
+            <div>
+            <p class="mt-1"><b>File:</b> {status.issue.files.values().next().value.path}</p>
+            <p class="mt-1"><b>Evidence:</b> {status.issue.files.values().next().value.evidence}</p>
+
+           </div>
           )}
         </div>
       )}
