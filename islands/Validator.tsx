@@ -78,6 +78,11 @@ export default function Validator() {
         const tree: { [key: string]: TreeEntry } = {};
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
+
+            console.log('File:', file.name);
+            console.log('Raw webkitRelativePath:', JSON.stringify(file.webkitRelativePath));
+            console.log('Split result:', file.webkitRelativePath.split('/'));
+            
             const path = file.webkitRelativePath.split('/');
             path.shift(); // Skip the top-level folder
             
