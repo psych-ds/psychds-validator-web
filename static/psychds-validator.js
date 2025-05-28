@@ -4822,6 +4822,7 @@ function evalColumns(_rule, context, schema, schemaPath) {
   if (context.extension !== ".csv")
     return;
   const headers = [...Object.keys(context.columns)];
+  context.dataset.allColumns = [.../* @__PURE__ */ new Set([...context.dataset.allColumns, ...headers])];
   let invalidHeaders = [];
   for (const header of headers) {
     if (!context.validColumns.includes(header)) {
@@ -4947,7 +4948,7 @@ function logSchemaIssues(context, issues) {
                         Each schema.org property (which take the form of keys in your metadata json) has a specific range of types
                         that can be used as its value. Type constraints for a given property can be found by visiting their corresponding schema.org
                         URL. All properties can take strings or URLS as objects, under the assumption that the string/URL represents a unique ID.
-                        Type selection errors occured at the following locations in your json structure: [${issues.typeIssues}]`
+                        Type selection errors occurred at the following locations in your json structure: [${issues.typeIssues}]`
         }
       ]);
     });
@@ -5380,6 +5381,7 @@ var psychDSContextDataset = class {
     this.sidecarCache = {};
     this.tree = {};
     this.ignored = [];
+    this.allColumns = [];
     if (options) {
       this.options = options;
     }
@@ -5594,15 +5596,23 @@ var psychDSContext = class {
         }
         return {};
       }
-      if ("@context" in this.sidecar) {
-        if (Array.isArray(this.sidecar["@context"]) && this.sidecar["@context"].length === 1) {
-          this.sidecar["@context"] = this.sidecar["@context"][0];
-        }
-        if (typeof this.sidecar["@context"] == "string" && ["http://schema.org/", "http://schema.org", "http://www.schema.org/", "http://www.schema.org", "https://schema.org/", "https://schema.org", "https://www.schema.org/", "https://www.schema.org/"].includes(this.sidecar["@context"])) {
-          this.sidecar["@context"] = {
-            "@vocab": "http://schema.org/"
-          };
-        }
+      const schemaForms = [
+        "http://schema.org/",
+        "http://schema.org",
+        "http://www.schema.org/",
+        "http://www.schema.org",
+        "https://schema.org/",
+        "https://schema.org",
+        "https://www.schema.org/",
+        "https://www.schema.org/"
+      ];
+      if ("@context" in this.sidecar && Array.isArray(this.sidecar["@context"]) && schemaForms.includes(this.sidecar["@context"][0])) {
+        this.sidecar["@context"] = this.sidecar["@context"][0];
+      }
+      if ("@context" in this.sidecar && typeof this.sidecar["@context"] == "string" && schemaForms.includes(this.sidecar["@context"])) {
+        this.sidecar["@context"] = {
+          "@vocab": "http://schema.org/"
+        };
       }
       const exp = await jsonldToUse.expand(this.sidecar, {
         documentLoader: customDocumentLoader
@@ -5720,6 +5730,7 @@ async function validate(fileTree, options) {
       fails.length > 0 ? { success: false, issue: issues.get(fails[0]) } : { success: true }
     );
   };
+  let validColumns = {};
   for await (const context of walkFileTree(fileTree, issues, dsContext)) {
     if (dsContext.baseDirs.includes("/data")) {
       options.emitter?.emit("find-data-dir", { success: true });
@@ -5769,6 +5780,24 @@ async function validate(fileTree, options) {
         "OBJECT_TYPE_MISSING"
       ]);
     }
+    if (context.validColumns.length != 0) {
+      context.validColumns.forEach((col) => {
+        if (!(col in validColumns))
+          validColumns[col] = false;
+        if (col in context.columns)
+          validColumns[col] = true;
+      });
+    }
+  }
+  const extraVars = Object.entries(validColumns).filter(([key, value]) => !value).map(([key]) => key);
+  if (extraVars.length != 0) {
+    issues.addSchemaIssue("VariableMissingFromCsvColumns", [
+      {
+        ...dsContext.metadataFile,
+        evidence: `One of the metadata files in your dataset (either dataset_description.json or a sidecar file) 
+          contains a variable in variableMeasured that does not appear in any CSV column headers. Here are the variables in question: [${extraVars}]`
+      }
+    ]);
   }
   options.emitter?.emit("metadata-utf8", { success: true });
   emitCheck("metadata-json", ["INVALID_JSON_FORMATTING"]);
@@ -5792,7 +5821,7 @@ async function validate(fileTree, options) {
   emitCheck("csv-header-repeat", ["CSV_HEADER_REPEATED"]);
   emitCheck("csv-nomismatch", ["CSV_HEADER_LENGTH_MISMATCH"]);
   emitCheck("csv-rowid", ["ROWID_VALUES_NOT_UNIQUE"]);
-  emitCheck("check-variableMeasured", ["CSV_COLUMN_MISSING_FROM_METADATA"]);
+  emitCheck("check-variableMeasured", ["CSV_COLUMN_MISSING_FROM_METADATA", "VARIABLE_MISSING_FROM_CSV_COLUMNS"]);
   checkDirRules(schema, rulesRecord, dsContext.baseDirs);
   checkMissingRules(schema, rulesRecord, issues);
   emitCheck("find-metadata", ["MISSING_DATASET_DESCRIPTION"]);
