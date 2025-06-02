@@ -5689,7 +5689,10 @@ async function validate(fileTree, options) {
       dsContext = new psychDSContextDataset(options, ddFile);
       issues.addSchemaIssue(
         "InvalidJsonFormatting",
-        [ddFile]
+        [{
+          ...ddFile,
+          evidence: _error.message
+        }]
       );
       options.emitter?.emit("metadata-json", {
         success: false,
