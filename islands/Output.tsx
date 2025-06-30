@@ -1,5 +1,6 @@
-import { useEffect } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
+// Define types for validation issues
 export type Severity = 'warning' | 'error' | 'ignore'
 
 export interface IssueFileDetail {
@@ -20,9 +21,6 @@ export interface IssueFileOutput {
   helpUrl: string
 }
 
-/**
- * Dataset issue, derived from OpenNeuro schema and existing validator implementation
- */
 export interface IssueOutput {
   severity: Severity
   key: string
@@ -32,106 +30,222 @@ export interface IssueOutput {
   additionalFileCount: number
   helpUrl: string
 }
-export interface FullTestIssuesReturn {
-    errors: IssueOutput[]
-    warnings: IssueOutput[]
-  }
 
-interface Props {
-    issues: FullTestIssuesReturn
-    validationResult: boolean
-    showWarnings: boolean
-    verbose: boolean
+export interface FullTestIssuesReturn {
+  errors: IssueOutput[]
+  warnings: IssueOutput[]
 }
 
-export default function Output({issues,validationResult,showWarnings,verbose}:Props){
-    return (
-        <div class=''>
-            {validationResult ? 
-            <div class="bg-white rounded-2xl border border-black border-solid mb-6 p-6">
-                <h3 class="text-green-600"><b>
-                    **************************************************<br />
-                    This dataset appears to be psych-DS compatible<br />
-                    **************************************************
-                    </b></h3>
-            </div>
-            : 
-            <div class=" bg-white rounded-2xl border border-black border-solid mb-6 p-6">
-                <h3 class="text-red-600"><b>
-                    ***********************************************************<br />
-                    This dataset does not appear to be psych-DS compatible<br />
-                    ***********************************************************
-                    
-                    </b></h3>
-            </div>
-            }
-            {issues.errors.map((item,index) => (
-                <div class="bg-white rounded-2xl hover:scale-[1.03] transition-transform duration-100 border border-black border-solid mb-6 p-6">
-                    <h3 ><b class="text-red-600">ERROR:</b> {item.key}</h3>
-                    <hr />
-                    <p><b>Reason: </b>{item.reason}</p>
-                    <hr />
-                    {item.files.length > 0 &&
-                        <div>
-                            <b>Evidence:</b>
-                            <ul>
-                                {item.files.map((file,i) => (
-                                <li>
-                                    <details>
-                                        <summary>
-                                            {file.file.path}
-                                        </summary>
-                                        {file.evidence && 
-                                            <div class=' border border-black border-solid mb-6 p-6'>
-                                                {file.evidence}
+// Define types for steps and their status
+interface StepStatus {
+  complete: boolean
+  success: boolean
+  issue?: any
+}
 
-                                            </div>
-                                        }
+interface StepMessage {
+  imperative: string
+  pastTense: string
+}
 
-                                    </details>
+interface Step {
+  key: string
+  message: StepMessage
+}
 
-                                </li>
-                                ))}  
-                            </ul>
-                        </div>
-                    }
-                    
-                </div>
-            ))}
-            {showWarnings &&
-                issues.warnings.map((item,index) => (
-                    <div class="bg-white rounded-2xl hover:scale-[1.03] transition-transform duration-100 border border-black border-solid mb-6 p-6">
-                        <h3 ><b class="text-yellow-600">WARNING:</b> {item.key}</h3>
-                        <hr />
-                        <p><b>Reason: </b>{item.reason}</p>
-                        <hr />
-                        {item.files.length > 0 &&
-                        <div>
-                            <b>Evidence:</b>
-                            <ul>
-                                {item.files.map((file,i) => (
-                                <li>
-                                    <details>
-                                        <summary>
-                                            {file.file.path}
-                                        </summary>
-                                        {file.evidence &&
-                                            <div class=' border border-black border-solid mb-6 p-6'>
-                                                {file.evidence}
+interface SuperStep extends Step {
+  subSteps: Step[]
+}
 
-                                            </div>
-                                        }
+// Define props for the Output component
+interface Props {
+  issues: FullTestIssuesReturn
+  validationComplete: boolean
+  validationResult: boolean
+  showWarnings: boolean
+  useEvents: boolean
+  stepStatus: Map<string, StepStatus>
+  steps: SuperStep[]
+  csvProgress?: { current: number; total: number;}
+}
 
-                                    </details>
+// StepItem component to render individual steps
+const StepItem = ({ step, status, stepStatus, csvProgress  }: { step: SuperStep, status: StepStatus, stepStatus: Map<string, StepStatus>, csvProgress?: { current: number; total: number; } }) => {
+  const icon = status.complete ? (status.success ? "✓" : "✗") : "⋯";
+  const iconColor = status.complete ? (status.success ? "text-green-600" : "text-red-600") : "text-yellow-600";
 
-                                </li>
-                                ))}  
-                            </ul>
-                        </div>
-                    }
-                    </div>
-                ))
-            }
+  const getStepMessage = () => {
+    const baseMessage = status.complete ? step.message.pastTense : step.message.imperative;
+    
+    // Add CSV progress for the validate-csvs step
+    if (step.key === "validate-csvs" && csvProgress && csvProgress.total > 0) {
+      return `${baseMessage} (${csvProgress.current}/${csvProgress.total} files checked)`;
+    }
+    
+    return baseMessage;
+  };
+
+  const message = getStepMessage();
+
+  return (
+    <div class="bg-white rounded-2xl hover:scale-[1.03] transition-transform duration-100 border border-black border-solid p-4 mb-4">
+      <h4 class="font-semibold flex items-center">
+        <span class={`${iconColor} mr-2`}>{icon}</span>
+        {message.replace("subfolder","subfolder (with at least one file)")}
+      </h4>
+      {status.issue && (
+        <div class="mt-2 text-red-600">
+          <p><b>Issue:</b> {status.issue.reason.replace("subdirectory","subdirectory (with at least one file)")}</p>
+          {status.issue.files.size != 0 && (
+            <p class="mt-1"><b>Evidence:</b> {status.issue.files.values().next().value.evidence}</p>
+          )}
         </div>
-    )
+      )}
+      {step.subSteps && step.subSteps.length > 0 && (
+        <div class="mt-2 pl-4 border-l-2 border-gray-300">
+          {step.subSteps.map((subStep) => {
+            const subStatus = stepStatus.get(subStep.key) || { complete: false, success: false };
+            let subMessage = subStatus.complete ? subStep.message.pastTense : subStep.message.imperative;
+            const subIcon = subStatus.complete ? (subStatus.success ? "✓" : "✗") : "⋯";
+            const subIconColor = subStatus.complete ? (subStatus.success ? "text-green-600" : "text-red-600") : "text-yellow-600";
+            
+            return (
+              <div key={subStep.key} class="mt-2">
+                <p class="flex items-center">
+                  <span class={`${subIconColor} mr-2`}>{subIcon}</span>
+                  {subMessage}
+                </p>
+                {subStatus.issue && (
+                  <div class="mt-1 ml-6 text-red-600">
+                    <p><b>Issue:</b> {subStatus.issue.reason}</p>
+                    {subStatus.issue.files.size != 0 && (
+                     <div>
+                      <p class="mt-1"><b>File:</b> {subStatus.issue.files.values().next().value.path}</p>
+                      <p class="mt-1"><b>Evidence:</b> {subStatus.issue.files.values().next().value.evidence}</p>
+
+                     </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Main Output component
+export default function Output({ issues, validationComplete, validationResult, showWarnings, useEvents, stepStatus, steps, csvProgress  }: Props) {
+    console.log(issues)
+    if (useEvents) {
+        return (
+          <div class="bg-white rounded-2xl border border-black border-solid mb-6 p-6">
+            <h3 class="text-xl font-bold mb-4">
+              Validation Progress: 
+              {validationComplete && (
+                <span class={validationResult ? "text-green-600" : "text-red-600"}>
+                  {validationResult ? " Dataset is valid" : " Dataset is invalid"}
+                </span>
+              )}
+            </h3>
+            <div id="validation-progress" class="space-y-4">
+              {steps.map((step) => (
+                <StepItem 
+                  key={step.key}
+                  step={step} 
+                  status={stepStatus.get(step.key) || { complete: false, success: false }}
+                  stepStatus={stepStatus}
+                  csvProgress={csvProgress}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+  // Render validation result and issues when not using events
+  return (
+    <div class=''>
+      {/* Display overall validation result */}
+      {validationResult ? 
+        <div class="bg-white rounded-2xl border border-black border-solid mb-6 p-6">
+          <h3 class="text-green-600"><b>
+            **************************************************<br />
+            This dataset appears to be psych-DS compatible<br />
+            **************************************************
+          </b></h3>
+        </div>
+        : 
+        <div class=" bg-white rounded-2xl border border-black border-solid mb-6 p-6">
+          <h3 class="text-red-600"><b>
+            ***********************************************************<br />
+            This dataset does not appear to be psych-DS compatible<br />
+            ***********************************************************
+          </b></h3>
+        </div>
+      }
+      {issues.errors.map((item, index) => (
+        <div key={index} class="bg-white rounded-2xl hover:scale-[1.03] transition-transform duration-100 border border-black border-solid mb-6 p-6">
+          <h3><b class="text-red-600">ERROR:</b> {item.key}</h3>
+          <hr />
+          <p><b>Reason: </b>{item.reason}</p>
+          <hr />
+          {item.files.length > 0 &&
+            <div>
+              <b>Evidence:</b>
+              <ul>
+                {item.files.map((file, i) => (
+                  <li key={i}>
+                    <details>
+                      <summary>
+                        {file.file.path}
+                      </summary>
+                      {file.evidence && 
+                        <div class=' border border-black border-solid mb-6 p-6'>
+                          {file.evidence}
+                        </div>
+                      }
+                    </details>
+                  </li>
+                ))}  
+              </ul>
+            </div>
+          }
+        </div>
+      ))}
+      {showWarnings &&
+        issues.warnings.map((item, index) => (
+          <div key={index} class="bg-white rounded-2xl hover:scale-[1.03] transition-transform duration-100 border border-black border-solid mb-6 p-6">
+            <h3><b class="text-yellow-600">WARNING:</b> {item.key}</h3>
+            <hr />
+            <p><b>Reason: </b>{item.reason}</p>
+            <hr />
+            {item.files.length > 0 &&
+              <div>
+                <b>Evidence:</b>
+                <ul>
+                  {item.files.map((file, i) => (
+                    <li key={i}>
+                      <details>
+                        <summary>
+                          {file.file.path}
+                        </summary>
+                        {file.evidence &&
+                          <div class=' border border-black border-solid mb-6 p-6'>
+                            {file.evidence}
+                          </div>
+                        }
+                      </details>
+                    </li>
+                  ))}  
+                </ul>
+              </div>
+            }
+          </div>
+        ))
+      }
+    </div>
+  );
 }
