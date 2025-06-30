@@ -66,29 +66,39 @@ interface Props {
   useEvents: boolean
   stepStatus: Map<string, StepStatus>
   steps: SuperStep[]
+  csvProgress?: { current: number; total: number;}
 }
 
 // StepItem component to render individual steps
-const StepItem = ({ step, status, stepStatus }: { step: SuperStep, status: StepStatus, stepStatus: Map<string, StepStatus> }) => {
-  const message = status.complete ? step.message.pastTense : step.message.imperative;
+const StepItem = ({ step, status, stepStatus, csvProgress  }: { step: SuperStep, status: StepStatus, stepStatus: Map<string, StepStatus>, csvProgress?: { current: number; total: number; } }) => {
   const icon = status.complete ? (status.success ? "✓" : "✗") : "⋯";
   const iconColor = status.complete ? (status.success ? "text-green-600" : "text-red-600") : "text-yellow-600";
+
+  const getStepMessage = () => {
+    const baseMessage = status.complete ? step.message.pastTense : step.message.imperative;
+    
+    // Add CSV progress for the validate-csvs step
+    if (step.key === "validate-csvs" && csvProgress && csvProgress.total > 0) {
+      return `${baseMessage} (${csvProgress.current}/${csvProgress.total} files checked)`;
+    }
+    
+    return baseMessage;
+  };
+
+  const message = getStepMessage();
 
   return (
     <div class="bg-white rounded-2xl hover:scale-[1.03] transition-transform duration-100 border border-black border-solid p-4 mb-4">
       <h4 class="font-semibold flex items-center">
         <span class={`${iconColor} mr-2`}>{icon}</span>
-        {message}
+        {message.replace("subfolder","subfolder (with at least one file)")}
       </h4>
       {status.issue && (
         <div class="mt-2 text-red-600">
-          <p><b>Issue:</b> {status.issue.reason}</p>
-          {status.issue.files && (
-            <div>
-            <p class="mt-1"><b>File:</b> {status.issue.files.values().next().value.path}</p>
+          <p><b>Issue:</b> {status.issue.reason.replace("subdirectory","subdirectory (with at least one file)")}</p>
+          {status.issue.files.size != 0 && (
             <p class="mt-1"><b>Evidence:</b> {status.issue.files.values().next().value.evidence}</p>
 
-           </div>
           )}
         </div>
       )}
@@ -96,7 +106,7 @@ const StepItem = ({ step, status, stepStatus }: { step: SuperStep, status: StepS
         <div class="mt-2 pl-4 border-l-2 border-gray-300">
           {step.subSteps.map((subStep) => {
             const subStatus = stepStatus.get(subStep.key) || { complete: false, success: false };
-            const subMessage = subStatus.complete ? subStep.message.pastTense : subStep.message.imperative;
+            let subMessage = subStatus.complete ? subStep.message.pastTense : subStep.message.imperative;
             const subIcon = subStatus.complete ? (subStatus.success ? "✓" : "✗") : "⋯";
             const subIconColor = subStatus.complete ? (subStatus.success ? "text-green-600" : "text-red-600") : "text-yellow-600";
             
@@ -109,7 +119,7 @@ const StepItem = ({ step, status, stepStatus }: { step: SuperStep, status: StepS
                 {subStatus.issue && (
                   <div class="mt-1 ml-6 text-red-600">
                     <p><b>Issue:</b> {subStatus.issue.reason}</p>
-                    {subStatus.issue.files && (
+                    {subStatus.issue.files.size != 0 && (
                      <div>
                       <p class="mt-1"><b>File:</b> {subStatus.issue.files.values().next().value.path}</p>
                       <p class="mt-1"><b>Evidence:</b> {subStatus.issue.files.values().next().value.evidence}</p>
@@ -128,7 +138,8 @@ const StepItem = ({ step, status, stepStatus }: { step: SuperStep, status: StepS
 };
 
 // Main Output component
-export default function Output({ issues, validationComplete, validationResult, showWarnings, useEvents, stepStatus, steps }: Props) {
+export default function Output({ issues, validationComplete, validationResult, showWarnings, useEvents, stepStatus, steps, csvProgress  }: Props) {
+    console.log(issues)
     if (useEvents) {
         return (
           <div class="bg-white rounded-2xl border border-black border-solid mb-6 p-6">
@@ -147,6 +158,7 @@ export default function Output({ issues, validationComplete, validationResult, s
                   step={step} 
                   status={stepStatus.get(step.key) || { complete: false, success: false }}
                   stepStatus={stepStatus}
+                  csvProgress={csvProgress}
                 />
               ))}
             </div>
@@ -191,7 +203,7 @@ export default function Output({ issues, validationComplete, validationResult, s
                       <summary>
                         {file.file.path}
                       </summary>
-                      {file.evidence != "" && 
+                      {file.evidence && 
                         <div class=' border border-black border-solid mb-6 p-6'>
                           {file.evidence}
                         </div>

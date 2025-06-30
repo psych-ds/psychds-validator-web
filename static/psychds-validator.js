@@ -3748,6 +3748,7 @@ var init_api = __esm({
                   }
                 }
               }
+
               if (this.state.quoting === false) {
                 const recordDelimiterLength = this.__isRecordDelimiter(chr, buf, pos);
                 if (recordDelimiterLength !== 0) {
@@ -5674,6 +5675,8 @@ async function validate(fileTree, options) {
   const summary = new Summary();
   const schema = await loadSchema(options.schema);
   const issues = new DatasetIssues(schema);
+  let totalCsvFiles = 0;
+  let processedCsvFiles = 0;
   options.emitter?.emit("build-tree", { success: true });
   summary.schemaVersion = schema.schema_version;
   const ddFile = fileTree.files.find(
@@ -5700,33 +5703,24 @@ async function validate(fileTree, options) {
       });
     }
   } else {
-    issues.addSchemaIssue(
-      "MissingDatasetDescription",
-      []
-    );
-    options.emitter?.emit("find-metadata", {
-      success: false,
-      issue: issues.get("MISSING_DATASET_DESCRIPTION")
-    });
-    if (options.emitter) {
-      return {
-        valid: false,
-        issues,
-        summary: summary.formatOutput()
-      };
-    }
     dsContext = new psychDSContextDataset(options);
   }
   const rulesRecord = {};
   findFileRules(schema, rulesRecord);
-  const emitCheck = (event_name, issue_keys) => {
+  const emitCheck = (event_name, issue_keys, progress) => {
     const fails = issue_keys.filter((issue) => issues.hasIssue({ key: issue }));
-    options.emitter?.emit(
-      event_name,
-      fails.length > 0 ? { success: false, issue: issues.get(fails[0]) } : { success: true }
-    );
+    const eventData = fails.length > 0 ? { success: false, issue: issues.get(fails[0]), progress } : { success: true, progress };
+    options.emitter?.emit(event_name, eventData);
   };
   let validColumns = {};
+  for await (const context of walkFileTree(fileTree, issues, dsContext)) {
+    if (context.extension === ".csv" && context.suffix === "data") {
+      totalCsvFiles++;
+    }
+  }
+  if (totalCsvFiles > 0) {
+    options.emitter?.emit("csv-count-total", { total: totalCsvFiles });
+  }
   for await (const context of walkFileTree(fileTree, issues, dsContext)) {
     if (dsContext.baseDirs.includes("/data")) {
       options.emitter?.emit("find-data-dir", { success: true });
@@ -5775,6 +5769,19 @@ async function validate(fileTree, options) {
         "INVALID_OBJECT_TYPE",
         "OBJECT_TYPE_MISSING"
       ]);
+      processedCsvFiles++;
+      options.emitter?.emit("csv-progress", {
+        current: processedCsvFiles,
+        total: totalCsvFiles
+      });
+      const csvProgress = { current: processedCsvFiles, total: totalCsvFiles };
+      emitCheck("csv-keywords", ["FILENAME_KEYWORD_FORMATTING_ERROR", "FILENAME_UNOFFICIAL_KEYWORD_ERROR"], csvProgress);
+      emitCheck("csv-parse", ["CSV_FORMATTING_ERROR"], csvProgress);
+      emitCheck("csv-header", ["CSV_HEADER_MISSING"], csvProgress);
+      emitCheck("csv-header-repeat", ["CSV_HEADER_REPEATED"], csvProgress);
+      emitCheck("csv-nomismatch", ["CSV_HEADER_LENGTH_MISMATCH"], csvProgress);
+      emitCheck("csv-rowid", ["ROWID_VALUES_NOT_UNIQUE"], csvProgress);
+
     }
     if (context.validColumns.length != 0) {
       context.validColumns.forEach((col) => {
@@ -6401,28 +6408,32 @@ async function _readFileTree(rootPathOrDict, relativePath, ignore2, parent, cont
   const tree = new FileTree(relativePath, name, parent);
   if (typeof rootPathOrDict === "string") {
     await requestReadPermission();
-    for await (const dirEntry of Deno.readDir(path.join(rootPathOrDict, relativePath))) {
-      if (dirEntry.isFile || dirEntry.isSymlink) {
-        const file = new psychDSFileDeno(
-          rootPathOrDict,
-          path.join(relativePath, dirEntry.name),
-          ignore2
-        );
-        if (dirEntry.name === ".psychds-ignore") {
-          ignore2.add(await readPsychDSIgnore(file));
+    try {
+      for await (const dirEntry of Deno.readDir(path.join(rootPathOrDict, relativePath))) {
+        if (dirEntry.isFile || dirEntry.isSymlink) {
+          const file = new psychDSFileDeno(
+            rootPathOrDict,
+            path.join(relativePath, dirEntry.name),
+            ignore2
+          );
+          if (dirEntry.name === ".psychds-ignore") {
+            ignore2.add(await readPsychDSIgnore(file));
+          }
+          tree.files.push(file);
         }
-        tree.files.push(file);
+        if (dirEntry.isDirectory) {
+          const dirTree = await _readFileTree(
+            rootPathOrDict,
+            path.join(relativePath, dirEntry.name),
+            ignore2,
+            tree,
+            context
+          );
+          tree.directories.push(dirTree);
+        }
       }
-      if (dirEntry.isDirectory) {
-        const dirTree = await _readFileTree(
-          rootPathOrDict,
-          path.join(relativePath, dirEntry.name),
-          ignore2,
-          tree,
-          context
-        );
-        tree.directories.push(dirTree);
-      }
+    } catch (error2) {
+      console.log("The path for your dataset must point to a directory, not a file. Please input a directory for your dataset input.");
     }
   } else {
     for (const key in rootPathOrDict) {
@@ -6583,7 +6594,7 @@ function browserFormatIssue(issue, options) {
   });
   if (!options?.verbose) {
     output.push("");
-    output.push(`  ${issue.files.size} more files with the same issue`);
+    output.push(`  ${issue.files.size - 1} more files with the same issue`);
   }
   output.push("");
   return output.join("\n");
@@ -6621,7 +6632,7 @@ function nodeFormatIssue(issue, options, chalk) {
   });
   if (!options?.verbose) {
     output.push("");
-    output.push("		" + issue.files.size + " more files with the same issue");
+    output.push("		" + (issue.files.size - 1) + " more files with the same issue");
   }
   output.push("");
   return output.join("\n");
@@ -6640,6 +6651,7 @@ var ValidationProgressTracker = class {
    * @param emitter - EventEmitter instance for tracking validation events
    */
   constructor(emitter) {
+    this.csvProgress = { current: 0, total: 0 };
     this.emitter = emitter;
     this.steps = [
       {
@@ -6801,6 +6813,13 @@ var ValidationProgressTracker = class {
     this.logger = null;
     this.setupListeners();
     this.initLogger();
+    this.emitter.on("csv-count-total", (data) => {
+      this.csvProgress.total = data.total;
+    });
+    this.emitter.on("csv-progress", (data) => {
+      this.csvProgress = data;
+      this.displayChecklist();
+    });
   }
   /**
    * Initializes the logger instance and displays initial checklist
@@ -6856,6 +6875,9 @@ var ValidationProgressTracker = class {
    * @private
    */
   updateStepStatus(stepKey, data, superStep) {
+    if (data.progress && stepKey.startsWith("csv-")) {
+      this.csvProgress = data.progress;
+    }
     this.stepStatus.set(stepKey, {
       complete: true,
       success: data.success,
@@ -6866,6 +6888,18 @@ var ValidationProgressTracker = class {
     }
     this.displayChecklist();
     this.lastUpdateTime = Date.now();
+  }
+  getCsvProgressText() {
+    if (this.csvProgress.total === 0)
+      return "";
+    return ` (${this.csvProgress.current}/${this.csvProgress.total} files checked)`;
+  }
+  getStepMessage(step, isComplete) {
+    const baseMessage = isComplete ? step.message.pastTense : step.message.imperative;
+    if (step.key === "validate-csvs") {
+      return baseMessage + this.getCsvProgressText();
+    }
+    return baseMessage;
   }
   /**
    * Updates a parent step's status based on its sub-steps
@@ -6908,9 +6942,13 @@ var ValidationProgressTracker = class {
       if (!superStepStatus?.complete) {
         thisComplete = false;
       }
-      const superStepMessage = superStepStatus?.complete && prevComplete && !prevFails ? superStep.message.pastTense : superStep.message.imperative;
-      const superStepCheckMark = superStepStatus?.complete && prevComplete && !prevFails ? superStepStatus.success ? "\u2713" : "\u2717" : " ";
-      if (superStepStatus?.complete && prevComplete && !prevFails) {
+      const isStepCompleteAndValid = (superStepStatus?.complete ?? false) && prevComplete && !prevFails;
+      const superStepMessage = this.getStepMessage(
+        superStep,
+        isStepCompleteAndValid
+      );
+      const superStepCheckMark = isStepCompleteAndValid && superStepStatus ? superStepStatus.success ? "\u2713" : "\u2717" : " ";
+      if (isStepCompleteAndValid) {
         this.emitter.emit("progress", { step: superStep });
         this.emitter.emit("stepStatusChange", {
           stepStatus: Array.from(this.stepStatus.entries()),
@@ -6920,41 +6958,42 @@ var ValidationProgressTracker = class {
       checklistLines.push(
         `[${superStepCheckMark}] ${index + 1}. ${superStepMessage}`
       );
-      if (superStepStatus?.complete && prevComplete && !prevFails && !superStepStatus.success && superStepStatus.issue) {
+      if (isStepCompleteAndValid && superStepStatus && !superStepStatus.success && superStepStatus.issue) {
         validationFailed = true;
         checklistLines.push(
           `   Issue:
  ${formatIssue(superStepStatus.issue)}`
         );
       }
-      if (!superStepStatus?.success && superStep.subSteps.length == 0) {
+      if (!(superStepStatus?.success ?? true) && superStep.subSteps.length == 0) {
         prevFails = true;
       }
       let subComplete = true;
       superStep.subSteps.forEach((subStep, subIndex) => {
         const subStepStatus = this.stepStatus.get(subStep.key);
-        const subStepMessage = subStepStatus?.complete && subComplete && !prevFails ? subStep.message.pastTense : subStep.message.imperative;
-        const subStepCheckMark = subStepStatus?.complete && subComplete && !prevFails ? subStepStatus.success ? "\u2713" : "\u2717" : " ";
+        const isSubStepCompleteAndValid = (subStepStatus?.complete ?? false) && subComplete && !prevFails;
+        const subStepMessage = isSubStepCompleteAndValid ? subStep.message.pastTense : subStep.message.imperative;
+        const subStepCheckMark = isSubStepCompleteAndValid && subStepStatus ? subStepStatus.success ? "\u2713" : "\u2717" : " ";
         checklistLines.push(
           `  [${subStepCheckMark}] ${index + 1}.${subIndex + 1}. ${subStepMessage}`
         );
-        if (subStepStatus?.complete && subComplete && !prevFails && !subStepStatus.success && subStepStatus.issue) {
+        if (isSubStepCompleteAndValid && subStepStatus && !subStepStatus.success && subStepStatus.issue) {
           validationFailed = true;
           checklistLines.push(
             `     Issue:
  ${formatIssue(subStepStatus.issue)}`
           );
         }
-        if (subStepStatus?.complete && subComplete && !prevFails) {
+        if (isSubStepCompleteAndValid) {
           this.emitter.emit("stepStatusChange", {
             stepStatus: Array.from(this.stepStatus.entries()),
             superStep
           });
         }
-        if (!subStepStatus?.complete) {
+        if (!(subStepStatus?.complete ?? false)) {
           subComplete = false;
         }
-        if (!subStepStatus?.success) {
+        if (!(subStepStatus?.success ?? true)) {
           prevFails = true;
         }
       });
@@ -6998,4 +7037,5 @@ export {
 };
 //# sourceMappingURL=psychds-validator.js.map
 
-if (typeof window !== "undefined") { window.psychDSValidator = { validateWeb }; }
+if (typeof window !== "undefined") { window.psychDSValidator = { validateWeb, ValidationProgressTracker }; }
+

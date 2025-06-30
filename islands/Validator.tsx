@@ -6,8 +6,10 @@ import EventEmitter from "https://esm.sh/eventemitter3@5.0.1";
 // Define global types for the window object
 declare global {
     interface Window {
-        validateWeb: (fileTree: any, options: any) => Promise<any>;
-        ValidationProgressTracker: new (eventEmitter: EventEmitter) => any;
+        psychDSValidator: {
+            validateWeb: (fileTree: any, options: any) => Promise<any>;
+            ValidationProgressTracker: new (eventEmitter: EventEmitter) => any;
+        };
     }
 }
 
@@ -48,16 +50,46 @@ export default function Validator() {
     const [stepStatus, setStepStatus] = useState(new Map());
     const [fileTree, setFileTree] = useState<{ [key: string]: TreeEntry }>({});
     const [isFileTreeExpanded, setIsFileTreeExpanded] = useState(false);
+    const [csvProgress, setCsvProgress] = useState({ current: 0, total: 0});
 
     useEffect(() => {
+
+        console.log('window:', window);
+    console.log('window.psychDSValidator:', window.psychDSValidator);
+    console.log('window.validateWeb:', window.validateWeb);
+    console.log('window.ValidationProgressTracker:', window.ValidationProgressTracker);
+    
+    if (!window.psychDSValidator) {
+        console.error('window.psychDSValidator is undefined!');
+        return;
+    }
+    
+    console.log('psychDSValidator keys:', Object.keys(window.psychDSValidator));
+    console.log('ValidationProgressTracker:', window.psychDSValidator.ValidationProgressTracker);
+    
+    if (!window.psychDSValidator.ValidationProgressTracker) {
+        console.error('ValidationProgressTracker not found in psychDSValidator!');
+        return;
+    }
         const eventEmitter = new EventEmitter()
         const progress = new window.psychDSValidator.ValidationProgressTracker(eventEmitter);
         setSteps(progress.steps);
         
+        eventEmitter.on('csv-progress', (data) => {
+            setCsvProgress(data);
+        });
+
+        eventEmitter.on('csv-count-total', (data) => {
+            setCsvProgress(prev => ({ ...prev, total: data.total }));
+        });
       }, []);
     
     // Reference for file input
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const showEmptyDirDialog = (event: Event) => {
+        window.alert("Validation cancelled. This happens \n\n(a) when you close the file picker without choosing a directory or \n\n(b) when you select a folder with no files inside. \n\nChoose a folder with at least one file inside it to continue.")
+    }
 
 
     // Function to handle file validation
@@ -66,11 +98,6 @@ export default function Validator() {
         const input = event.target as HTMLInputElement;
         const files = input.files;
 
-        if (!files || files.length === 0) {
-            console.error("No files selected");
-            return;
-        }
-
         setIsValidating(true);
         setValidationComplete(false);
 
@@ -78,11 +105,6 @@ export default function Validator() {
         const tree: { [key: string]: TreeEntry } = {};
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-
-            console.log('File:', file.name);
-            console.log('Raw webkitRelativePath:', JSON.stringify(file.webkitRelativePath));
-            console.log('Split result:', file.webkitRelativePath.split('/'));
-            
             const path = file.webkitRelativePath.split('/');
             path.shift(); // Skip the top-level folder
             
@@ -110,6 +132,14 @@ export default function Validator() {
             const eventEmitter = new EventEmitter()
             const progress = new window.psychDSValidator.ValidationProgressTracker(eventEmitter);
             setStepStatus(progress.stepStatus)
+
+            eventEmitter.on('csv-progress', (data) => {
+                setCsvProgress(data);
+            });
+
+            eventEmitter.on('csv-count-total', (data) => {
+                setCsvProgress(prev => ({ ...prev, total: data.total }));
+            });
 
             // Handle step status changes
             eventEmitter.on('stepStatusChange', ({ stepStatus: newStepStatus, superStep }) => {
@@ -162,9 +192,35 @@ export default function Validator() {
         setShowWarnings((event.target as HTMLInputElement).checked);
     };
 
-    const changeUseEvents = (event: Event) => {
+    const changeUseEvents = async (event: Event) => {
         const isChecked = (event.target as HTMLInputElement).checked;
         setUseEvents(isChecked);
+        
+        // If switching FROM events mode TO traditional mode AND we have a completed validation
+        if (!isChecked && validationComplete && Object.keys(fileTree).length > 0) {
+            console.log('Re-running validation for traditional mode...');
+            
+            // Clear current state
+            setValidationComplete(false);
+            setIssues({ errors: [], warnings: [] });
+            setIsValidating(true);
+            
+            try {
+                // Re-run validation without events for traditional mode
+                const result = await window.psychDSValidator.validateWeb(fileTree, {});
+                
+                // Update state with traditional validation results
+                setValidationComplete(true);
+                setValidationResult(result.valid);
+                setIssues(result.issues.formatOutput());
+            } catch (error) {
+                console.error("Error during re-validation:", error);
+                setValidationComplete(true);
+                setValidationResult(false);
+            } finally {
+                setIsValidating(false);
+            }
+        }
     };
 
     // Render component
@@ -174,14 +230,26 @@ export default function Validator() {
             <div class="border rounded-2xl bg-gray-100 border-black border-solid p-6">
                 <ul>
                     <li>
-                        <h2 class="text-left">For help structuring your Psych-DS dataset, try the <a target="_blank" style="color:blue" href="https://psychds-docs.readthedocs.io/en/latest/guides/1_getting_started/">Getting Started Guide</a></h2>
+                        <h2 class="text-left">For help structuring your Psych-DS dataset, try the <a target="_blank" style="color:blue" href="https://psychds-docs.readthedocs.io/en/latest/Guides/1_getting_started/">Getting Started Guide</a></h2>
                     </li>
                     <br/>
 
                     <li>
                         <h2 class="text-left">For help generating your metadata files, try the <a target="_blank" style="color:blue" href="https://psych-ds.github.io/cedar-wizard-psychds/">Cedar Metadata Wizard</a></h2>
                     </li>
-
+                </ul>
+            </div>
+            <br/>
+            <div class="border rounded-2xl bg-gray-100 border-black border-solid p-6">
+                <ul>
+                    <li>
+                        <h2 class="text-left"><i>Please note:
+                        Although the word "upload" may appear when selecting a folder, no files will be sent to our server or stored in any way.</i></h2>
+                    </li>
+                    <br/>
+                    <li>
+                        <h2 class="text-left"><i>You must choose a folder with at least one file inside it - otherwise validation will be cancelled.</i></h2>
+                    </li>
                 </ul>
             </div>
             <br />
@@ -197,6 +265,7 @@ export default function Validator() {
                         directory=""
                         multiple
                         onChange={handleValidate}
+                        onCancel={showEmptyDirDialog}
                         disabled={isValidating}
                     />
                     {isValidating && (
@@ -206,7 +275,6 @@ export default function Validator() {
                         </div>
                     )}
                 </div>
-                <h2><i>Note: Although the word "upload" may appear when selecting a folder, no files will be sent to our server or stored in any way.</i></h2>
                 <hr class="pt-2 pb-2"/>
                 <form>
                     <label><b>Options:</b></label>
@@ -247,6 +315,7 @@ export default function Validator() {
                         useEvents={useEvents} 
                         stepStatus={stepStatus} 
                         steps={steps}
+                        csvProgress={csvProgress} 
                     />
                 }
             </div>
