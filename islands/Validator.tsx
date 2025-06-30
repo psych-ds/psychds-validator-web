@@ -23,7 +23,7 @@ interface FileEntry {
 interface DirectoryEntry {
     name: string;
     type: 'directory';
-    contents: object; // Recursive type definition
+    contents: { [key: string]: TreeEntry };
 }
 
 type TreeEntry = FileEntry | DirectoryEntry;
@@ -97,9 +97,6 @@ export default function Validator() {
         event.preventDefault();
         const input = event.target as HTMLInputElement;
         const files = input.files;
-
-        
-
 
         setIsValidating(true);
         setValidationComplete(false);
@@ -192,8 +189,8 @@ export default function Validator() {
 
     // Event handlers for UI controls
     const changeShowWarnings = (event: Event) => {
-        setShowWarnings((event.target as HTMLInputElement).checked)
-    }
+        setShowWarnings((event.target as HTMLInputElement).checked);
+    };
 
     const changeUseEvents = async (event: Event) => {
         const isChecked = (event.target as HTMLInputElement).checked;

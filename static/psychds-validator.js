@@ -3748,6 +3748,7 @@ var init_api = __esm({
                   }
                 }
               }
+
               if (this.state.quoting === false) {
                 const recordDelimiterLength = this.__isRecordDelimiter(chr, buf, pos);
                 if (recordDelimiterLength !== 0) {
@@ -5780,6 +5781,7 @@ async function validate(fileTree, options) {
       emitCheck("csv-header-repeat", ["CSV_HEADER_REPEATED"], csvProgress);
       emitCheck("csv-nomismatch", ["CSV_HEADER_LENGTH_MISMATCH"], csvProgress);
       emitCheck("csv-rowid", ["ROWID_VALUES_NOT_UNIQUE"], csvProgress);
+
     }
     if (context.validColumns.length != 0) {
       context.validColumns.forEach((col) => {
@@ -7036,3 +7038,4 @@ export {
 //# sourceMappingURL=psychds-validator.js.map
 
 if (typeof window !== "undefined") { window.psychDSValidator = { validateWeb, ValidationProgressTracker }; }
+

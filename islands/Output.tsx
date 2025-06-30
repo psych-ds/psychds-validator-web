@@ -98,6 +98,7 @@ const StepItem = ({ step, status, stepStatus, csvProgress  }: { step: SuperStep,
           <p><b>Issue:</b> {status.issue.reason.replace("subdirectory","subdirectory (with at least one file)")}</p>
           {status.issue.files.size != 0 && (
             <p class="mt-1"><b>Evidence:</b> {status.issue.files.values().next().value.evidence}</p>
+
           )}
         </div>
       )}
