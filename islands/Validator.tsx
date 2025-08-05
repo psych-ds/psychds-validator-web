@@ -3,6 +3,9 @@ import Output from './Output.tsx';
 import FileTreeView from './FileTreeView.tsx';
 import EventEmitter from "https://esm.sh/eventemitter3@5.0.1";
 
+// Import browser-fs-access
+import { directoryOpen } from 'browser-fs-access';
+
 // Define global types for the window object
 declare global {
     interface Window {
@@ -53,24 +56,50 @@ export default function Validator() {
     const [csvProgress, setCsvProgress] = useState({ current: 0, total: 0});
 
     useEffect(() => {
+        // Check if user is on a non-Chromium browser and show recommendation
+        const isChromium = () => {
+            // Check for Chromium-based browsers more accurately
+            return (
+                /Chrome/i.test(navigator.userAgent) && 
+                !/Edg/i.test(navigator.userAgent) && // Exclude old Edge
+                !(/Safari/i.test(navigator.userAgent) && !/Chrome/i.test(navigator.userAgent))
+            ) || 
+            /Edg/i.test(navigator.userAgent) || // New Chromium-based Edge
+            /Chromium/i.test(navigator.userAgent);
+        };
+
+        if (!isChromium()) {
+            // Show browser recommendation popup
+            const showBrowserRecommendation = () => {
+                window.alert(
+                    "For the best user experience with the Psych-DS Validator, we recommend using Chrome, Edge, or another Chromium-based browser.\n\n" +
+                    "These browsers provide better file system access and faster performance.\n\n" +
+                    "You can continue using your current browser, but you may experience slower performance."
+                );
+            };
+
+            // Show the recommendation after a short delay so the page loads first
+            setTimeout(showBrowserRecommendation, 500);
+        }
 
         console.log('window:', window);
-    console.log('window.psychDSValidator:', window.psychDSValidator);
-    console.log('window.validateWeb:', window.validateWeb);
-    console.log('window.ValidationProgressTracker:', window.ValidationProgressTracker);
-    
-    if (!window.psychDSValidator) {
-        console.error('window.psychDSValidator is undefined!');
-        return;
-    }
-    
-    console.log('psychDSValidator keys:', Object.keys(window.psychDSValidator));
-    console.log('ValidationProgressTracker:', window.psychDSValidator.ValidationProgressTracker);
-    
-    if (!window.psychDSValidator.ValidationProgressTracker) {
-        console.error('ValidationProgressTracker not found in psychDSValidator!');
-        return;
-    }
+        console.log('window.psychDSValidator:', window.psychDSValidator);
+        console.log('window.validateWeb:', window.validateWeb);
+        console.log('window.ValidationProgressTracker:', window.ValidationProgressTracker);
+        
+        if (!window.psychDSValidator) {
+            console.error('window.psychDSValidator is undefined!');
+            return;
+        }
+        
+        console.log('psychDSValidator keys:', Object.keys(window.psychDSValidator));
+        console.log('ValidationProgressTracker:', window.psychDSValidator.ValidationProgressTracker);
+        
+        if (!window.psychDSValidator.ValidationProgressTracker) {
+            console.error('ValidationProgressTracker not found in psychDSValidator!');
+            return;
+        }
+        
         const eventEmitter = new EventEmitter()
         const progress = new window.psychDSValidator.ValidationProgressTracker(eventEmitter);
         setSteps(progress.steps);
@@ -82,38 +111,28 @@ export default function Validator() {
         eventEmitter.on('csv-count-total', (data) => {
             setCsvProgress(prev => ({ ...prev, total: data.total }));
         });
-      }, []);
-    
-    // Reference for file input
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    }, []);
 
-    const showEmptyDirDialog = (event: Event) => {
-        window.alert("Validation cancelled. This happens \n\n(a) when you close the file picker without choosing a directory or \n\n(b) when you select a folder with no files inside. \n\nChoose a folder with at least one file inside it to continue.")
-    }
-
-
-    // Function to handle file validation
-    const handleValidate = async (event: Event) => {
-        event.preventDefault();
-        const input = event.target as HTMLInputElement;
-        const files = input.files;
-
-        setIsValidating(true);
-        setValidationComplete(false);
-
-        // Build file tree structure
+    // Function to build file tree from files array
+    const buildFileTree = (files: File[]) => {
         const tree: { [key: string]: TreeEntry } = {};
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            const path = file.webkitRelativePath.split('/');
-            path.shift(); // Skip the top-level folder
+        
+        for (const file of files) {
+            // Handle both webkitRelativePath and regular path
+            const relativePath = (file as any).webkitRelativePath || file.name;
+            const pathParts = relativePath.split('/');
             
-            if (path.length === 0) continue;
+            // Skip the top-level folder name if it exists
+            if (pathParts.length > 1) {
+                pathParts.shift();
+            }
+            
+            if (pathParts.length === 0) continue;
             
             let currentLevel = tree;
-            for (let j = 0; j < path.length; j++) {
-                const part = path[j];
-                if (j === path.length - 1) {
+            for (let j = 0; j < pathParts.length; j++) {
+                const part = pathParts[j];
+                if (j === pathParts.length - 1) {
                     // It's a file
                     currentLevel[part] = { name: part, type: 'file', file: file };
                 } else {
@@ -125,8 +144,51 @@ export default function Validator() {
                 }
             }
         }
+        
+        return tree;
+    };
 
-        setFileTree(tree);
+    // Simple directory selection function
+    const handleDirectorySelection = async () => {
+        setValidationComplete(false);
+
+        try {
+            // Use browser-fs-access (works in modern browsers, falls back gracefully)
+            const files = await directoryOpen({
+                recursive: true,
+            });
+
+            // Sanity check for file count
+            if (files.length === 0) {
+                window.alert("The selected directory appears to be empty or contains no accessible files. Please select a directory with dataset files.");
+                return;
+            }
+
+            if (files.length > 10000) {
+                const proceed = window.confirm(
+                    `This directory contains ${files.length.toLocaleString()} files. ` +
+                    "This may take a while to validate. Continue?"
+                );
+                
+                if (!proceed) return;
+            }
+
+            // Build file tree
+            const tree = buildFileTree(files);
+            setFileTree(tree);
+
+            // Start validation
+            await performValidation(tree);
+
+        } catch (error) {
+            console.error("Directory selection error:", error);
+            // Just log and continue - user likely cancelled
+        }
+    };
+
+    // Shared validation logic
+    const performValidation = async (tree: { [key: string]: TreeEntry }) => {
+        setIsValidating(true);
 
         try {
             const eventEmitter = new EventEmitter()
@@ -179,11 +241,9 @@ export default function Validator() {
             }
         } catch (error) {
             console.error("Error during validation:", error);
+            window.alert("An error occurred during validation. Please check the console for details.");
         } finally {
             setIsValidating(false);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
         }
     };
 
@@ -248,7 +308,7 @@ export default function Validator() {
                     </li>
                     <br/>
                     <li>
-                        <h2 class="text-left"><i>You must choose a folder with at least one file inside it - otherwise validation will be cancelled.</i></h2>
+                        <h2 class="text-left"><i>Browser limitations may prevent detection of empty directories (e.g., an empty "data" folder). </i></h2>
                     </li>
                 </ul>
             </div>
@@ -256,25 +316,24 @@ export default function Validator() {
             {/* File selection and options */}
             <div class="border rounded-2xl bg-gray-100 border-black border-solid p-6">
                 <h2 class="text-left"><b>Select a Psych-DS dataset to validate</b></h2>
-                <div class="flex items-center">
-                    <input 
-                        ref={fileInputRef}
-                        class="pb-2" 
-                        type='file' 
-                        webkitdirectory="true"
-                        directory=""
-                        multiple
-                        onChange={handleValidate}
-                        onCancel={showEmptyDirDialog}
+                
+                {/* Primary selection method */}
+                <div class="mb-4">
+                    <button 
+                        onClick={handleDirectorySelection}
                         disabled={isValidating}
-                    />
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                        Select Dataset Directory
+                    </button>
                     {isValidating && (
-                        <div class="flex items-center ml-4">
+                        <div class="flex items-center ml-4 inline-flex">
                             <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900 mr-2"></div>
                             <span>Validating dataset... this may take a moment</span>
                         </div>
                     )}
                 </div>
+
                 <hr class="pt-2 pb-2"/>
                 <form>
                     <label><b>Options:</b></label>
